@@ -1,0 +1,139 @@
+Diário — Dia 1
+
+Comecei às 9:30, terminei 10:20.
+Estudei WHERE, CASE e NULL.
+Usei o nosso material do GitHub para estudo, usei também a w3schools para ver como funciona o case.
+Fiz 10 exercícios.
+Consegui fazer 7 sem pesquisa alguma, só olhando o resumo que eu escrevi.
+Tive dificuldade nos exercícios 5, que eu não entendi de jeito nenhum, 9 e 10 eu tive dificuldade quanto a sintaxe do código, mas pesquisei e entendi o erro da sintaxe.
+Tempo total: 50min (tenho q levar minha vó na farmácia)
+
+1️⃣ Primeiro: revisão — 10 min
+
+Antes dos exercícios, abra seu material de SQL e revise rapidamente:
+
+WHERE 
+:: ele vai adicionar uma condição na nossa pesquisa, filtrando os resultados. Exemplo: Select * From tabela 1 WHERE info1 = 'valorx';
+
+operadores =, <>, >, <, >=, <= 
+:: o = vai significar igualdade, ent ele só vai pegar o valor que for igual a nossa condição. já o restante ele vai assumir um sentido de condição, ou seja, caso o valor x seja maior, menor, igual que , menor que etc é isso que eu quero que apareça.
+
+AND / OR 
+:: eles vão adicionar mais uma camada de filtro na nossa pesquisa, ent eu quero que o info1 < 'valorx' E ou OU info2 > 'valory' 
+
+IN
+:: ele vai pegar o valor que esteja entre uma lista de opções determinada, ou seja, a info1 só vai aparecer se o valorx for(1,7,9,10) 
+
+BETWEEN
+:: aqui ele vai filtrar o valor num intervalo determinado, info1 esta no meio de 'valorx' E 'valory' 
+
+LIKE
+:: ele vai pegar valores que tenham um caracter coringa( usa % pra isso), ent info1 like 'ca%', ele pega todos os valores que possuam as iniciais ca
+
+
+IS NULL
+IS NOT NULL
+:: ele vai verificar e pegar os valores que estejam nulos ou não estejam nulos
+
+CASE WHEN (THEN) (END AS) (From
+:: ele vai adicionar um caso para nossa pesquisa, ent QUANDO info1 <20 ENT ele é 'x',  QUANDO info1 ESTA ENTRE 20 E 50 ENT 'y', SE NÃO 'Z' ACABOU APELIDO Consulta. o case sempre encerra com END e é uma boa pratica apelidar a nossa pesquisa, o From vem por ultimo tbm
+CASE
+  WHEN info1 < 20 THEN 'x'
+  WHEN info1 BETWEEN 20 AND 50 THEN 'y'
+  ELSE 'z'
+END AS Consulta
+FROM tabela1;
+
+2️⃣ Depois: 10 exercícios
+
+
+🟢 Exercício 1 — WHERE
+
+Liste todos os clientes que moram em Campinas.
+--1
+SELECT * FROM Clientes
+WHERE cidade = 'Campinas';
+
+🟢 Exercício 2 — comparação
+
+Liste os clientes com idade maior ou igual a 30 anos.
+--2 
+SELECT * FROM Clientes
+WHERE idade >= 30;
+
+🟢 Exercício 3 — AND
+
+Liste os clientes que:
+moram em Campinas
+e têm pelo menos 30 anos.
+--3
+SELECT * FROM Clientes
+WHERE cidade = 'Campinas' AND idade >= 30;
+
+🟢 Exercício 4 — OR
+
+Liste os clientes que moram em:
+Campinas
+ou Valinhos.
+--4
+SELECT * FROM Clientes
+WHERE cidade = 'Campinas' OR cidade = 'Valinhos';
+
+🟢 Exercício 5 — IN
+Faça o exercício anterior novamente, mas utilizando IN.
+--5
+SELECT * FROM Clientes
+Where cidade IN ('Campinas', 'Valinhos');
+
+🟡 Exercício 6 — BETWEEN
+Liste os pedidos cujo valor esteja entre 100 e 400 reais.
+--6
+SELECT * FROM Pedidos
+WHERE valor BETWEEN 100 AND 400; 
+
+🟡 Exercício 7 — LIKE
+Liste os clientes cujo nome começa com a letra C.
+--7
+SELECT * FROM Clientes
+Where nome LIKE 'C%';
+
+🟡 Exercício 8 — NULL
+Liste os clientes cuja idade não foi informada.
+--8 
+SELECT * FROM Clientes
+WHERE idade IS NULL;
+
+🟠 Exercício 9 — CASE
+
+Crie uma consulta que mostre:
+id | valor | classificacao
+E classifique os pedidos assim:
+valor >= 300 → "Alto"
+valor >= 100 → "Médio"
+abaixo de 100 → "Baixo"
+--9
+SELECT id, valor ,
+	CASE 
+		When valor >= 300 THEN 'Alto'
+    	When valor >= 100 THEN 'Medio' 
+    	ELSE 'Baixo'
+    END AS classificacao
+ FROM Pedidos;
+
+🔴 Exercício 10 — desafio
+
+Liste os pedidos não cancelados, com valor maior que 100.
+Depois mostre uma coluna chamada classificacao usando CASE:
+= 300 → "Alto"
+< 300 → "Normal"
+Aqui quero que você combine:
+WHERE + AND + CASE
+ --10
+SELECT *,
+    CASE 
+        WHEN valor >= 300 THEN 'Alto'
+        ELSE 'Normal'
+    END AS classificacao
+FROM Pedidos
+WHERE status <> 'Cancelado'
+  AND valor > 100;
