@@ -26,8 +26,8 @@ Em cada pasta de diário (`Dia 1`, `Dia 2`, etc.), você verá:
 
 | Dia | Tópicos Principais | Status |
 | :---: | :--- | :---: |
-| [Dia 1](./Di%C3%A1rio%20%E2%80%94%20Dia%201.txt) | `WHERE`, `CASE`, `NULL` e Operadores | ✅ Concluído |
-| [Dia 2](./Dia%202.txt) | Revisão (`IN`, `CASE`) + Introdução a `Subqueries` | ✅ Concluído |
+| [Dia 1](./Semana%201/Di%C3%A1rio%20%E2%80%94%20Dia%201.txt) | `WHERE`, `CASE`, `NULL` e Operadores | ✅ Concluído |
+| [Dia 2](./Semana%201/Dia%202.txt) | Revisão (`IN`, `CASE`) + Introdução a `Subqueries` | ✅ Concluído |
 | *Dia 3* | *Em breve...* | ⏳ |
 
 ---
