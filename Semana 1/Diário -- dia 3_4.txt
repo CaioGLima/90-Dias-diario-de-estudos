@@ -1,0 +1,113 @@
+📚 Diário de Evolução Profissional — Dias 3 e 4
+📅 Dias 3 e 4 — SQL: Revisão de Subqueries
+
+Objetivo: consolidar o entendimento de subqueries, principalmente a diferença entre subqueries que retornam um único valor, múltiplos valores e subqueries correlacionadas.
+
+Durante os dois dias, o foco foi revisão e fixação de subqueries, sem introdução de um novo conteúdo.
+
+Percebi uma dificuldade principalmente na interpretação dos enunciados. Em alguns exercícios, eu entendia parcialmente o que precisava ser feito, mas acabava traduzindo o problema de forma incorreta para SQL. Os erros foram mais relacionados ao raciocínio necessário para montar a consulta do que à sintaxe isoladamente.
+
+🟢 Exercício 1 — Subquery com valor único
+
+Objetivo: encontrar pedidos cujo valor seja menor que a média de todos os pedidos.
+
+SELECT id, cliente_id, valor
+FROM Pedidos
+WHERE valor < (SELECT AVG(valor) FROM Pedidos);
+
+Resultado: ✅ Correto.
+
+Aprendizado: a subquery pode retornar um único valor, nesse caso a média de todos os pedidos, que posteriormente é utilizada na comparação com cada registro da consulta principal.
+
+🟡 Exercício 2 — Subquery com múltiplos valores
+
+Objetivo: encontrar clientes que possuem pelo menos um pedido acima de 300.
+
+SELECT c.id, c.nome
+FROM Clientes AS c
+WHERE id IN (
+    SELECT p.cliente_id
+    FROM Pedidos AS p
+    WHERE p.valor > 300
+      AND p.cliente_id = c.id
+);
+
+Resultado: ✅ Correto, porém inicialmente houve dificuldade na interpretação do resultado da subquery.
+
+Inicialmente pensei que a consulta interna retornaria o pedido de maior valor do cliente, porém a consulta não utilizava MAX(). Ela retornava os cliente_id relacionados aos pedidos que atendiam à condição.
+
+Aprendizado: uma subquery pode retornar múltiplas linhas, e IN pode ser utilizado para verificar se um valor está presente nesse conjunto.
+
+🟢 Exercício 3 — Subquery correlacionada
+
+Objetivo: mostrar o menor pedido de cada cliente.
+
+SELECT c.nome,
+       (SELECT MIN(p.valor)
+        FROM Pedidos p
+        WHERE p.cliente_id = c.id) AS menor_pedido
+FROM Clientes c;
+
+Resultado: ✅ Correto.
+
+Aprendizado: compreensão da utilização de uma subquery correlacionada para realizar uma agregação (MIN) considerando o cliente da linha atual da consulta principal.
+
+🟢 Exercício 4 — Clientes sem pedidos
+
+Objetivo: encontrar clientes que nunca fizeram pedidos.
+
+Primeira ideia: verificar quais cliente_id não existiam nos pedidos.
+
+Após corrigir a estrutura:
+
+SELECT id, nome
+FROM Clientes
+WHERE id NOT IN (
+    SELECT cliente_id
+    FROM Pedidos
+);
+
+Resultado: ✅ Correto.
+
+Aprendizado: utilização de NOT IN com uma subquery para encontrar registros que não estão presentes no conjunto retornado pela consulta interna.
+
+🟡 Exercício 5 — Maior pedido acima de 500
+
+Objetivo: encontrar clientes cujo maior pedido seja superior a 500 e mostrar esse maior pedido.
+
+Primeira tentativa: tentei calcular o MAX() e utilizar o alias maior_pedido diretamente na condição, mas houve erro na estrutura da consulta.
+
+Após analisar o problema:
+
+SELECT c.id, c.nome,
+       (SELECT MAX(p.valor)
+        FROM Pedidos p
+        WHERE p.cliente_id = c.id) AS maior_pedido
+FROM Clientes c
+WHERE (SELECT MAX(p.valor)
+       FROM Pedidos p
+       WHERE p.cliente_id = c.id) > 500;
+
+Resultado: ✅ Correto.
+
+Aprendizado: uma subquery correlacionada pode ser utilizada tanto para produzir uma informação (maior_pedido) quanto para filtrar registros no WHERE.
+
+🧠 Principais aprendizados dos Dias 3 e 4
+Subqueries podem retornar um único valor.
+Subqueries podem retornar múltiplos valores.
+IN e NOT IN podem trabalhar com resultados de subqueries.
+Subqueries correlacionadas conseguem utilizar valores da consulta externa.
+MIN() e MAX() podem ser utilizados dentro de subqueries correlacionadas.
+Uma subquery pode ser utilizada diretamente dentro de uma condição do WHERE.
+É importante identificar o que a consulta interna precisa retornar antes de começar a escrever a query.
+A principal dificuldade encontrada foi a interpretação do enunciado e transformação do problema em etapas SQL, e não apenas a sintaxe.
+📌 Ponto a melhorar
+
+Ler o enunciado com mais atenção antes de escrever a consulta, identificando primeiro:
+
+O que preciso encontrar?
+Qual informação preciso calcular?
+A consulta interna retorna um valor ou vários?
+A consulta interna precisa se relacionar com a linha atual da consulta externa?
+
+
