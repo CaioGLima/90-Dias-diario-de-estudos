@@ -26,11 +26,11 @@ Em cada pasta de diário (`Dia 1`, `Dia 2`, etc.), você verá:
 
 | Dia | Tópicos Principais | Status |
 | :---: | :--- | :---: |
-| [Dia 1](./Semana%201/Di%C3%A1rio%20%E2%80%94%20Dia%201.txt) | `WHERE`, `CASE`, `NULL` e Operadores | ✅ Concluído |
-| [Dia 2](./Semana%201/Dia%202.txt) | Revisão (`IN`, `CASE`) + Introdução a `Subqueries` | ✅ Concluído |
-| [Dias 3 e 4](./Semana%201/Diário%20--%20dia%203_4.txt) | Exercícios de fixação em `subquery` | ✅ Concluído |
-| [Dia 5](./Semana%201/Diário%20--%20dia%205.txt) | Joins (`Right`, `Left`, `Inner` e `Outer`) | ✅ Concluído |
-| [Dia 6](./Semana%201/Dia%206.txt) | [Preencher tópicos do dia 6] | ⏳ |
+| [Dia 1](./Semana%201/Dia-1.txt) | [Preencher tópicos do dia 1] | ✅ Concluído |
+| [Dia 2](./Semana%201/Dia-2.txt) | Revisão (`IN`, `CASE`) + Introdução a `Subqueries` | ✅ Concluído |
+| [Dias 3 e 4](./Semana%201/Dia-3-4.txt) | Exercícios de fixação em `subquery` | ✅ Concluído |
+| [Dia 5](./Semana%201/Dia-5.txt) | Joins (`Right`, `Left`, `Inner` e `Outer`) | ✅ Concluído |
+| [Dia 6](./Semana%201/Dia-6.txt) | [Preencher tópicos do dia 6] | ⏳ |
 
 ---
 
