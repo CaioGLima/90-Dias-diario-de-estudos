@@ -1,0 +1,118 @@
+📖 Diário de Estudos — Dia 2
+🕒 Horário: 09:37 às 11:15 (Tempo total: ~1h 38m)
+📚 Tópicos: Revisão de IN e CASE + Estudo de Subqueries
+📝 Materiais: Material do GitHub e W3Schools
+📊 Progresso: 10 exercícios propostos | 7 concluídos na primeira tentativa
+
+🧠 Reflexões do Dia
+O que foi tranquilo: A sintaxe básica e o entendimento de IN e CASE fluíram bem com a ajuda dos exemplos anteriores.
+Onde travei:
+
+Exercício 3 e 4: Conseguia entender o erro do compilador e ajustar a sintaxe, mas apanhei da lógica/interpretação de o que exatamente deveria ser feito para a sintaxe ter sentido.
+Exercício 5: Acabei pulando porque ele envolvia a mesma lógica que estava travando nos anteriores.
+Após revisar o conteúdo, consegui entender os erros e corrigir 
+
+🛠️ Parte 1: Exercícios — IN e CASE
+🟢 1 — IN: Clientes por cidade
+Enunciado: Liste os clientes que moram em Campinas, Valinhos ou Hortolândia (obrigatório usar IN).
+
+SELECT * FROM Clientes
+WHERE cidade IN ('Campinas', 'Valinhos', 'Hortolândia');
+
+🟢 2 — IN + NOT: Excluindo cidades
+Enunciado: Liste os clientes que não moram em Campinas nem em Valinhos.
+
+SELECT * FROM Clientes
+WHERE cidade NOT IN ('Campinas', 'Valinhos');
+
+🟡 3 — CASE: Faixa etária
+Enunciado: Mostre nome, idade e classificacao baseada na idade (<18: "Menor", 18-30: "Adulto", >30: "30+").
+
+SELECT nome, idade,
+	CASE 
+    	WHEN idade < 18 THEN 'Menor'
+        WHEN idade BETWEEN 18 AND 30 THEN 'Adulto'
+        WHEN idade > 30 THEN '30+' 
+    	ELSE 'Faltou informar idade' 
+	END AS classificacao 
+FROM Clientes;
+
+🟡 4 — CASE + WHERE: Classificando pedidos
+Enunciado: Liste pedidos não cancelados com id, valor e classificação por faixa de valor (>=300: "Alto", >=100: "Medio", <100: "Baixo").
+
+SELECT id, valor, 
+	CASE 
+    	WHEN valor >= 300 THEN 'Alto' 
+        WHEN valor >= 100 THEN 'Medio' 
+        ELSE 'Baixo'
+    END AS classificacao
+FROM Pedidos
+WHERE status <> 'Cancelado';
+
+🟠 5 — Desafio: Pedidos filtrados + CASE
+Enunciado: Pedidos não cancelados, com valor > 50, e classificação de valor.
+
+SELECT id, valor, 
+	CASE 
+    	WHEN valor >= 300 THEN 'Alto' 
+        WHEN valor >= 100 THEN 'Medio' 
+        ELSE 'Baixo'
+    END AS classificacao
+FROM Pedidos
+WHERE status <> 'Cancelado'
+  AND valor > 50;
+
+💡 Momento Estudo: Subqueries
+Uma subquery (ou subconsulta) é uma consulta dentro de outra consulta. Ela pode aparecer no WHERE e em outros lugares, dependendo do caso.
+
+🔍 Parte 2: Exercícios — Subqueries
+🟢 Exercício 1 — Subquery simples
+Enunciado: Encontre os clientes que possuem pelo menos um pedido (id e nome).
+
+SELECT id, nome 
+FROM Clientes
+WHERE id IN (SELECT cliente_id FROM Pedidos);
+
+🟢 Exercício 2 — IN + Subquery
+Enunciado: Liste os nomes dos clientes que possuem pedidos com valor maior que R$ 200.
+
+SELECT id, nome 
+FROM Clientes
+WHERE id IN (
+    SELECT cliente_id 
+    FROM Pedidos 
+    WHERE valor > 200
+);
+
+🟡 Exercício 3 — Subquery com agregação
+Enunciado: Encontre os pedidos cujo valor seja maior que a média de todos os pedidos (id, cliente_id, valor).
+
+SELECT id, cliente_id, valor 
+FROM Pedidos
+WHERE valor > (SELECT AVG(valor) FROM Pedidos);
+
+🟠 Exercício 4 — Subquery correlacionada
+Enunciado: Para cada cliente, mostre nome e o maior_pedido.
+
+SELECT c.nome, 
+       (SELECT MAX(p.valor) FROM Pedidos p WHERE p.cliente_id = c.id) AS maior_pedido
+FROM Clientes c;
+
+🔴 Exercício 5 — Desafio Final
+Enunciado: Encontre os clientes cujo maior pedido seja maior que a média geral de todos os pedidos (id, nome).
+
+SELECT c.id, c.nome
+FROM Clientes c 
+WHERE (
+    SELECT MAX(p.valor) 
+    FROM Pedidos p 
+    WHERE p.cliente_id = c.id
+) > (
+    SELECT AVG(valor) 
+    FROM Pedidos
+);
+
+🧠 Nota de Entendimento do Desafio 5:
+
+Lado esquerdo (Correlacionado): A subquery olha para cada cliente da consulta principal (c.id), vai na tabela de Pedidos e descobre o maior valor daquele cliente específico.
+Lado direito (Agregação simples): A outra subquery calcula a média geral de todos os pedidos da empresa inteira, sem precisar se preocupar com quem é o cliente individual.
