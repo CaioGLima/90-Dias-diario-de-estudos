@@ -26,12 +26,12 @@ Em cada pasta de diário (`Dia 1`, `Dia 2`, etc.), você verá:
 
 | Dia | Tópicos Principais | Status |
 | :---: | :--- | :---: |
-| [Dia 1](./Semana%201/Di%C3%A1rio%20%E2%80%94%20Dia%201.txt) | `WHERE`, `CASE`, `NULL` e Operadores | ✅ Concluído |
-| [Dia 2](./Semana%201/Dia%202.txt) | Revisão (`IN`, `CASE`) + Introdução a `Subqueries` | ✅ Concluído |
-| [Dias 3 e 4](./Semana%201/Di%C3%A1rio%20--%20dia%203_4.txt) | [Preencher tópicos do dia 3 e 4] | ✅ Concluído |
-| [Dia 5](./Semana%201/Dia%205.txt) | [Preencher tópicos do dia 5] | ✅ Concluído |
-| [Dia 6](./Semana%201/Dia%206.txt) | `Joins`, `Having`, `Group by` | ✅ Concluído |
-| [Dia 7](./Semana%201/Dia%207.txt) | [Preencher tópicos do dia 7] | ⏳ |
+| [Dia 1](./Semana%201/Dia-1.txt) | `WHERE`, `CASE`, `NULL` e Operadores | ✅ Concluído |
+| [Dia 2](./Semana%201/Dia-2.txt) | Revisão (`IN`, `CASE`) + Introdução a `Subqueries` | ✅ Concluído |
+| [Dias 3 e 4](./Semana%201/Diario-dia-3_4.txt) | [Preencher tópicos do dia 3 e 4] | ✅ Concluído |
+| [Dia 5](./Semana%201/Dia-5.txt) | [Preencher tópicos do dia 5] | ✅ Concluído |
+| [Dia 6](./Semana%201/Dia-6.txt) | `Joins`, `Having`, `Group by` | ✅ Concluído |
+| [Dia 7](./Semana%201/Dia-7.txt) | [Preencher tópicos do dia 7] | ⏳ |
 ---
 
 > *"Constconstância vence a intensidade."* 🚀 Acompanhe a jornada!
