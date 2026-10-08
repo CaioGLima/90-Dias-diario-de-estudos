@@ -1,0 +1,73 @@
+Diário de Estudos — Dia 6
+🕒 Horário: 9:50 às 10:40
+📚 Tópicos: Joins, Having, Group by
+📝 Materiais: Material do GitHub
+📊 Progresso: 5 exercicios
+
+📚 Estudos
+GROUP BY: Agrupa registros que possuem o mesmo valor em determinadas colunas, permitindo realizar cálculos sobre cada grupo.
+HAVING: Trabalha junto do GROUP BY e permite aplicar condições sobre os grupos formados.
+Ponto importante: Quando usamos GROUP BY, as colunas que aparecem no SELECT e não são funções de agregação normalmente precisam estar no GROUP BY.
+WHERE → filtra linhas antes do agrupamento.
+HAVING → filtra grupos depois do agrupamento.
+Funções de agregação estudadas:
+- SUM() → soma valores
+- COUNT() → conta registros
+- AVG() → calcula média
+- MAX() → maior valor
+- MIN() → menor valor
+
+--1 (Usei subquery e houve duplicação de resultados)
+Exercício 1
+Mostre o nome de cada cliente e o total gasto por ele em pedidos.
+SELECT c.nome,(Select SUM(p.valor) From Pedidos p WHERE p.cliente_id = c.id) From Clientes c
+INNER Join Pedidos p ON c.id = p.cliente_id
+-- 2* tentativa, na 1* eu havia feito sem o (select sum) e havia retornado tudo, sem somar os valores totais... na 2* eu retornei corretamente os valores, mas eles vieram duplicados ou seja João João 450 450, Maria Maria 700 700 etc 
+--Tinha feito com Left Join, porem ele veio com a ana NULL, ent eu troquei para Inner, que não retornaria o valor NULL
+
+--2 (Mesmo exercicio, agora poedm usar apenas Join SUM() GROUP BY)
+🧠 Exercício 2
+Faça novamente:
+Mostre o nome de cada cliente e o total gasto por ele.
+
+Mas agora NÃO pode usar subquery.
+
+SELECT c.nome, SUM(p.valor) From Clientes c 
+Inner Join Pedidos p ON c.id= p.cliente_id
+Group by c.nome;
+--Eu travei por um momento, pois estava tentando agrupar os valores usando c.id como nome da tabela referente, mas eu não declarei ela no SELECT
+
+--3 (Having)
+🚀 Exercício 3 — agora vamos adicionar HAVING
+Usando as mesmas tabelas:
+Mostre apenas os clientes cujo total gasto seja maior que 400, exibindo nome e total_gasto.
+
+SELECT c.nome, SUM(p.valor) as total_valor 
+From Clientes c 
+Inner Join Pedidos p ON c.id= p.cliente_id
+Group by c.nome
+HAVING SUM(p.valor) > 400;
+--Aqui eu só adicionei a condição do having
+
+--4 
+🧩 Exercício 4 — agora quero te fazer pensar
+Mostre os clientes que fizeram pelo menos 2 pedidos, exibindo o nome e a quantidade de pedidos.
+SELECT c.nome, COUNT(p.id) as total_pedidos 
+From Clientes c 
+Inner Join Pedidos p ON c.id= p.cliente_id
+Group by c.nome
+HAVING COUNT(p.id) > 1;
+--Admito que eu por um momento esqueci a função "count" e fiquei me perguntando como eu faria para fazer a contagem de pedidos, mas ao descobrir a função, a query veio automatica na mente.
+
+--5 
+🧩 Exercício 5 — fechando a sessão
+Agora vou misturar o que você acabou de aprender.
+Mostre o nome dos clientes, a quantidade de pedidos e o total gasto, mas somente para clientes que fizeram pelo menos 2 pedidos e gastaram mais de R$400 no total.
+SELECT c.id, c.nome, COUNT(p.id) as total_pedidos, SUM(p.valor) as total_valor
+From Clientes c 
+Inner Join Pedidos p ON c.id= p.cliente_id
+Group by c.id, c.nome 
+HAVING COUNT(p.id) > 1 AND SUM(p.valor) > 400;
+--1* tentativa, eu errei alguma coisa no having, eu havia colocado uma ',' dps do c.nome no Group by sem querer
+
+
