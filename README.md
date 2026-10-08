@@ -33,5 +33,4 @@ Em cada pasta de diário (`Dia 1`, `Dia 2`, etc.), você verá:
 | [Dia 6](./Semana%201/Dia-6.txt) | `Joins`, `Having`, `Group by` | ✅ Concluído |
 | [Dia 7](./Semana%201/Dia-7.txt) | [Preencher tópicos do dia 7] | ⏳ |
 ---
-
 > *"Constconstância vence a intensidade."* 🚀 Acompanhe a jornada!
