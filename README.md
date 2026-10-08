@@ -28,8 +28,8 @@ Em cada pasta de diário (`Dia 1`, `Dia 2`, etc.), você verá:
 | :---: | :--- | :---: |
 | [Dia 1](./Semana%201/Dia-1.txt) | `WHERE`, `CASE`, `NULL` e Operadores | ✅ Concluído |
 | [Dia 2](./Semana%201/Dia-2.txt) | Revisão (`IN`, `CASE`) + Introdução a `Subqueries` | ✅ Concluído |
-| [Dias 3 e 4](./Semana%201/Diario-dia-3_4.txt) | [Preencher tópicos do dia 3 e 4] | ✅ Concluído |
-| [Dia 5](./Semana%201/Dia-5.txt) | [Preencher tópicos do dia 5] | ✅ Concluído |
+| [Dias 3 e 4](./Semana%201/Dia-3-4.txt) | Subqueries Avançadas / Prática | ✅ Concluído |
+| [Dia 5](./Semana%201/Dia-5.txt) | `JOIN`, `INNER JOIN`, `OUTER JOIN`, `LEFT` e `RIGHT JOIN` | ✅ Concluído |
 | [Dia 6](./Semana%201/Dia-6.txt) | `Joins`, `Having`, `Group by` | ✅ Concluído |
 | [Dia 7](./Semana%201/Dia-7.txt) | [Preencher tópicos do dia 7] | ⏳ |
 ---
