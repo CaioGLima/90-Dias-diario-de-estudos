@@ -1,0 +1,107 @@
+Diário de Estudos — Dia 7
+
+🕒 Horário: 1h
+📚 Tópicos: JOINs, GROUP BY, HAVING, COUNT(), SUM() e COALESCE()
+📝 Materiais: Material do GitHub e exercícios práticos
+📊 Progresso: 5 exercícios
+
+📚 Estudos
+LEFT JOIN: Retorna todos os registros da tabela à esquerda, mesmo quando não existe correspondência na tabela da direita.
+COUNT(p.id): Conta os registros em que p.id não é NULL.
+COUNT(*): Conta todas as linhas do resultado, incluindo as linhas preservadas pelo LEFT JOIN.
+SUM(): Soma os valores de cada grupo, mas pode retornar NULL quando não existem valores para somar.
+COALESCE(): Retorna o primeiro valor que não seja NULL. Pode ser usado para substituir um resultado nulo por 0.
+GROUP BY: Agrupa registros para permitir cálculos sobre cada grupo.
+HAVING: Filtra os grupos depois da agregação.
+
+Ponto importante: Quando usamos LEFT JOIN, um cliente sem pedidos continua aparecendo no resultado. Por isso, precisamos escolher corretamente o que contar ou somar.
+
+Exemplo:
+
+COUNT(*) → retorna 1 para um cliente sem pedidos.
+COUNT(p.id) → retorna 0 para um cliente sem pedidos.
+SUM(p.valor) → retorna NULL para um cliente sem pedidos.
+COALESCE(SUM(p.valor), 0) → retorna 0 para um cliente sem pedidos.
+
+📝 Exercícios
+
+1 — LEFT JOIN + COUNT + GROUP BY
+Enunciado: Mostre todos os clientes e a quantidade de pedidos de cada um, inclusive aqueles que nunca fizeram pedidos.
+
+SELECT c.nome,
+       COUNT(p.id) AS quantidade_pedido
+FROM Clientes c
+LEFT JOIN Pedidos p ON p.cliente_id = c.id
+GROUP BY c.id, c.nome;
+
+
+2 — LEFT JOIN + SUM + COALESCE
+Enunciado: Mostre todos os clientes e o total gasto em pedidos. Clientes sem pedidos devem aparecer com total 0.
+
+SELECT c.nome,
+       COALESCE(SUM(p.valor), 0) AS total_gasto
+FROM Clientes c
+LEFT JOIN Pedidos p ON p.cliente_id = c.id
+GROUP BY c.id, c.nome;
+
+
+3 — COUNT + GROUP BY + HAVING
+Enunciado: Mostre os clientes que fizeram pelo menos dois pedidos, exibindo o nome e a quantidade de pedidos.
+
+SELECT c.nome,
+       COUNT(p.id) AS quantidade_pedido
+FROM Clientes c
+LEFT JOIN Pedidos p ON p.cliente_id = c.id
+GROUP BY c.id, c.nome
+HAVING COUNT(p.id) >= 2;
+
+
+
+4 — COUNT + SUM + HAVING
+Enunciado: Mostre o nome dos clientes, a quantidade de pedidos e o total gasto, somente para clientes que fizeram pelo menos dois pedidos e gastaram mais de R$400.
+
+SELECT c.nome,
+       COUNT(p.id) AS quantidade_pedido,
+       SUM(p.valor) AS total_gasto
+FROM Clientes c
+LEFT JOIN Pedidos p ON p.cliente_id = c.id
+GROUP BY c.id, c.nome
+HAVING COUNT(p.id) >= 2
+   AND SUM(p.valor) > 400;
+
+
+5 — Investigando COUNT(*)
+Enunciado: Analisar uma consulta que deveria mostrar todos os clientes e a quantidade de pedidos de cada um.
+
+SELECT c.id,
+       c.nome,
+       COUNT(*) AS quantidade_pedidos
+FROM Clientes c
+LEFT JOIN Pedidos p
+    ON p.cliente_id = c.id
+GROUP BY c.id, c.nome
+HAVING COUNT(*) > 0;
+
+5.1 — Existe erro de sintaxe?
+Não identifiquei erro de sintaxe. A consulta executa normalmente.
+
+5.2 — O que acontece com a Ana?
+Como o LEFT JOIN preserva a linha da Ana, mesmo sem pedido correspondente, COUNT(*) retorna 1, embora ela não possua pedidos.
+
+5.3 — Por que isso acontece?
+Porque COUNT(*) conta todas as linhas do resultado do JOIN, incluindo a linha preservada pelo LEFT JOIN em que as colunas de Pedidos são NULL.
+
+5.4 — O HAVING é necessário?
+Não. Como cada cliente possui pelo menos uma linha no resultado do LEFT JOIN, HAVING COUNT(*) > 0 não elimina nenhum cliente e acaba sendo desnecessário.
+Se fosse utilizado COUNT(p.id), a Ana teria contagem 0. Nesse caso, HAVING COUNT(p.id) > 0 excluiria clientes sem pedidos, o que também contrariaria o objetivo de mostrar todos os clientes.
+
+
+
+📌 Principais aprendizados do dia
+Escolher o JOIN de acordo com os registros que precisam ser preservados.
+Diferenciar COUNT(*) de COUNT(p.id).
+Entender o comportamento de SUM() quando não existem valores correspondentes.
+Utilizar COALESCE() para substituir NULL por 0.
+Combinar COUNT(), SUM(), GROUP BY e HAVING.
+
+Identificar consultas que executam normalmente, mas apresentam resultados inadequados para o enunciado.
