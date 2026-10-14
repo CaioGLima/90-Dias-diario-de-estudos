@@ -1,0 +1,135 @@
+Diário de Estudos — Dia 8
+Data: 14/10/2026
+Horário: 10h–11h e 18h40–19h
+Tempo total: 1h20min
+Materiais: Material do GitHub e Alura
+
+📚 Tópicos estudados
+CTE (Common Table Expression) — WITH
+Organização de consultas SQL em etapas
+JOIN, GROUP BY e HAVING
+Funções de agregação: COUNT() e SUM()
+Subconsultas com AVG()
+Filtragem de resultados com WHERE
+Aliases e referências às colunas de uma CTE
+
+📝 1. Anotações teóricas — CTE
+
+A CTE (Common Table Expression) é um recurso do SQL que ajuda a dividir uma consulta em etapas, melhorando a organização e facilitando o entendimento da lógica.
+Ela permite definir um resultado nomeado que pode ser utilizado pela consulta principal. Esse resultado existe durante a execução da instrução SQL e não é uma tabela física permanente.
+A CTE é especialmente útil para simplificar consultas complexas, dividindo a lógica em partes menores e facilitando a manutenção do código.
+Minha nota mental: a CTE pode ajudar bastante em consultas longas que precisam reutilizar um cálculo ou organizar várias etapas de processamento. Em vez de repetir a mesma lógica diversas vezes, posso definir uma etapa uma vez e referenciá-la na consulta principal.
+
+Estrutura básica
+WITH nome_consulta AS (
+    -- Definição da consulta
+)
+SELECT *
+FROM nome_consulta;
+
+Também é possível declarar explicitamente os nomes das colunas:
+
+WITH nome_consulta (coluna1, coluna2) AS (
+    -- Consulta que retorna as colunas correspondentes
+)
+SELECT *
+FROM nome_consulta;
+
+O WITH inicia a definição da CTE, seguido pelo nome escolhido e pela palavra-chave AS, que introduz a consulta entre parênteses. Depois, a consulta principal pode utilizar a CTE como fonte de dados.
+Observação importante: a CTE não é necessariamente mais rápida do que uma consulta direta. Sua principal vantagem é organizar a lógica e melhorar a legibilidade quando isso realmente ajuda.
+
+💻 2. Exercícios realizados
+
+Exercício 1 — Clientes com pelo menos dois pedidos
+Objetivo: mostrar o nome dos clientes e a quantidade de pedidos, retornando somente aqueles com dois ou mais pedidos.
+
+SELECT
+    c.nome,
+    COUNT(p.id) AS quantidade_pedidos
+FROM Clientes c
+LEFT JOIN Pedidos p
+    ON p.cliente_id = c.id
+GROUP BY c.nome, c.id
+HAVING COUNT(p.id) >= 2;
+
+Exercício 2 — Reescrevendo a consulta com CTE
+Objetivo: obter o mesmo resultado do exercício anterior, agora utilizando uma CTE.
+
+WITH pedidos_por_clientes AS (
+    SELECT
+        c.id,
+        c.nome,
+        COUNT(p.id) AS quantidade_pedidos
+    FROM Clientes c
+    LEFT JOIN Pedidos p
+        ON p.cliente_id = c.id
+    GROUP BY c.nome, c.id
+)
+SELECT
+    nome,
+    quantidade_pedidos
+FROM pedidos_por_clientes
+WHERE quantidade_pedidos >= 2;
+
+
+Aprendizados:
+A CTE permite separar o cálculo da quantidade de pedidos da filtragem final.
+A consulta principal utiliza a CTE como fonte de dados.
+O filtro pode ser aplicado na consulta externa usando WHERE.
+Dúvida que surgiu: por que não preciso escrever c.nome na consulta principal?
+Resposta: o alias c foi definido para a tabela Clientes dentro da consulta que cria a CTE. Na consulta principal, a fonte de dados passa a ser pedidos_por_clientes, que disponibiliza as colunas selecionadas na definição da CTE.
+Por isso, posso escrever nome diretamente ou criar um novo alias para a CTE, como pc.nome.
+
+Exercício 3 — Clientes que gastaram mais de R$ 400
+Objetivo: calcular o total gasto por cliente e mostrar somente aqueles cujo total ultrapassa R$ 400.
+
+WITH total_por_cliente AS (
+    SELECT
+        c.id,
+        c.nome,
+        SUM(p.valor) AS total_gasto
+    FROM Clientes c
+    LEFT JOIN Pedidos p
+        ON p.cliente_id = c.id
+    GROUP BY c.nome, c.id
+)
+SELECT
+    nome,
+    total_gasto
+FROM total_por_cliente
+WHERE total_gasto > 400;
+
+Exercício 4 — Clientes que gastaram acima da média
+Objetivo: calcular o total gasto por cliente, obter a média dos totais e mostrar somente os clientes cujo gasto ultrapassa essa média.
+
+WITH total_por_cliente AS (
+    SELECT
+        c.id,
+        c.nome,
+        SUM(p.valor) AS total_gasto
+    FROM Clientes c
+    LEFT JOIN Pedidos p
+        ON p.cliente_id = c.id
+    GROUP BY c.id, c.nome
+)
+SELECT
+    nome,
+    total_gasto,
+    (
+        SELECT AVG(total_gasto)
+        FROM total_por_cliente
+    ) AS media_gasto
+FROM total_por_cliente
+WHERE total_gasto > (
+    SELECT AVG(total_gasto)
+    FROM total_por_cliente
+);
+
+Aprendizados:
+
+A CTE calcula o total gasto por cliente.
+A subconsulta com AVG() calcula a média dos totais individuais.
+O WHERE compara o total de cada cliente com a média geral.
+É possível combinar CTEs e subconsultas na mesma instrução SQL.
+
+Observação: a média aparece duas vezes na consulta. Isso é válido para o exercício; em consultas mais elaboradas, podemos avaliar outras formas de organizar esse cálculo.
