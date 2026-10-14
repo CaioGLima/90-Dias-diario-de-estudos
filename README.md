@@ -32,7 +32,7 @@ Em cada pasta de diário (`Dia 1`, `Dia 2`, etc.), você verá:
 | [Dia 5](./Semana%201/Dia-5.txt) | `JOIN`, `INNER JOIN`, `OUTER JOIN`, `LEFT` e `RIGHT JOIN` | ✅ Concluído |
 | [Dia 6](./Semana%201/Dia-6.txt) | `Joins`, `Having`, `Group by` | ✅ Concluído |
 | [Dia 7](./Semana%201/Dia-7.txt) | 'JOINs', 'GROUP BY', 'HAVING', 'COUNT()', 'SUM()' e 'COALESCE()' | ✅ Concluído |
-| [Dia 8](./Semana%202/Dia-8.txt) | 'CTE (Common Table Expression)' — 'WITH' | ⏳ |
+| [Dia 8](./Semana%202/Dia-8.txt) | 'CTE (Common Table Expression)' — 'WITH' | ✅ Concluído |
 | [Dia 9](./Semana%201/Dia-9.txt) | [Preencher tópicos do dia 9] | ⏳ |
 ---
 > *"Constconstância vence a intensidade."* 🚀 Acompanhe a jornada!
