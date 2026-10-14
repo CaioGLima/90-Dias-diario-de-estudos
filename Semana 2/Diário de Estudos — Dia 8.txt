@@ -1,0 +1,36 @@
+Diário de Estudos — Dia 8
+
+🕒 Horário: 10h - 11h
+📚 Tópicos: 
+📝 Materiais: Material do GitHub, ALURA
+📊 Progresso: 
+
+CTE- a CTE(Common Table Expression) é um recurso que ajuda a dividir a consulta em etapas para melhorar a conferencia e a organização de Ideias. Ela permite criar resultado temporário, que depois de criada, estruturada e utilizada é apagada. Ela é usada para simplificar a escrita de consultas complexas, ajudando a dividir a logica em partes menores, para facilitar entendimento.
+Nota mental para mim: a CTE ela vai ajudar e muito em pesquisas muito longas que utilizariam dados declarados varias vezes. EX: num código que definimos uma consulta como valor total, com o CTE a gente definiria 1x e na msm consulta a gente só puxaria essa consulta, sem ter que definir ela novamente em outra parte do código.
+ Estrutura do código:
+WITH nome_consulta[(nome_colunas[...,...])] AS (CTE_definição_da_consulta)
+o WITH começa no código para que possa ser nomeada a CTE, dps a nomenclatura da CTE, depois é declarado o nome das colunas da tabela temporária(é necessário usar AS e declarar consulta).
+
+
+--1 (Join, Group by, HAving)
+SELECT c.nome, COUNT(p.id) as quantidade_pedidos FROM Clientes c 
+Left Join Pedidos p ON p.cliente_id = c.id 
+Group BY c.nome, c.id
+HAVING COUNT(p.id) >= 2;
+
+--2(Mesma coisa, mas agora usando CTE) 
+WITH pedidos_por_clientes AS (SELECT c.id, c.nome, COUNT(p.id) as quantidade_pedidos FROM Clientes c 
+Left Join Pedidos p ON p.cliente_id = c.id 
+Group BY c.nome, c.id) 
+SELECT nome, quantidade_pedidos 
+FROM pedidos_por_clientes
+WHERE quantidade_pedidos >= 2;
+--Eu dei uma olhada no codigo que vc tinha feito antes para entender a estrutura, pq tinha dado erro... eu tinha feito tudo certo, mas na consulta principal, eu coloquei c.nome ao inves de nome... pq eu n uso mais c. p. ali???
+
+--3 
+WITH total_por_cliente AS (SELECT c.id, c.nome, SUM(p.valor) as total_gasto FROM Clientes c 
+Left Join Pedidos p ON p.cliente_id = c.id 
+Group BY c.nome, c.id) 
+SELECT nome, total_gasto
+FROM total_por_cliente
+WHERE total_gasto > 400;
