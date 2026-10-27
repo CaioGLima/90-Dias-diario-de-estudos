@@ -1,0 +1,120 @@
+Diário de Estudos — Dia 9
+
+Data: 16/10/2026
+Horários: 09h30–10h10 / 09h15–10h00
+Tempo total: 1h25min (considerando os dois períodos informados)
+Material: W3Schools
+Tema principal: SQL — EXISTS, NOT EXISTS e UNION
+
+1. Conteúdo estudado
+
+EXISTS e NOT EXISTS
+
+O EXISTS é um operador utilizado para verificar se uma subconsulta retorna pelo menos uma linha. Seu resultado funciona como uma condição verdadeira ou falsa:
+EXISTS: retorna verdadeiro quando a subconsulta encontra pelo menos uma linha.
+NOT EXISTS: retorna verdadeiro quando a subconsulta não encontra nenhuma linha correspondente.
+
+Observação pessoal: A subconsulta pode ajudar a verificar informações relacionadas a outra tabela, cumprindo um objetivo semelhante ao de algumas consultas com JOIN, mas sem necessariamente combinar as tabelas no resultado principal.
+
+Sintaxe:
+SELECT nome_coluna
+FROM nome_tabela
+WHERE EXISTS (
+    subconsulta
+);
+
+UNION
+O UNION é um operador utilizado para combinar os resultados de duas ou mais consultas SELECT. Por padrão, elimina as linhas duplicadas.
+
+Regras importantes:
+Todas as consultas devem retornar o mesmo número de colunas.
+As colunas correspondentes devem ter tipos de dados compatíveis.
+As colunas devem aparecer na mesma ordem em cada consulta.
+É possível utilizar UNION para combinar resultados de consultas diferentes sobre a mesma tabela.
+
+Sintaxe:
+SELECT nome_coluna
+FROM tabela1
+UNION
+SELECT nome_coluna
+FROM tabela2;
+
+2. Exercícios realizados
+
+Exercício 1 — EXISTS
+Objetivo: Retornar os clientes que possuem pelo menos um pedido acima de R$ 250.
+Solução:
+
+SELECT nome
+FROM Clientes
+WHERE EXISTS (
+    SELECT cliente_id
+    FROM Pedidos
+    WHERE Pedidos.cliente_id = Clientes.id
+      AND valor > 250
+);
+
+
+Exercício 2 — NOT EXISTS
+Objetivo: Retornar os clientes que não possuem nenhum pedido.
+Solução:
+
+SELECT nome
+FROM Clientes
+WHERE NOT EXISTS (
+    SELECT cliente_id
+    FROM Pedidos
+    WHERE Pedidos.cliente_id = Clientes.id
+);
+
+
+Exercício 3 — CTE + EXISTS
+Objetivo: Retornar clientes cujo total gasto em pedidos é superior a R$ 400.
+Solução:
+
+WITH total_por_clientes AS (
+    SELECT
+        c.id,
+        c.nome,
+        SUM(p.valor) AS total_gasto
+    FROM Clientes c
+    INNER JOIN Pedidos p
+        ON p.cliente_id = c.id
+    GROUP BY c.nome, c.id
+)
+SELECT nome
+FROM total_por_clientes AS externo
+WHERE EXISTS (
+    SELECT total_gasto
+    FROM total_por_clientes AS interno
+    WHERE interno.id = externo.id
+      AND total_gasto > 400
+);
+
+
+Exercício 4 — UNION
+Objetivo: Combinar os clientes que possuem pedidos com os clientes cujos nomes começam com a letra A.
+Solução:
+
+SELECT nome
+FROM Clientes
+WHERE id IN (
+    SELECT cliente_id
+    FROM Pedidos
+)
+UNION
+SELECT nome
+FROM Clientes
+WHERE nome LIKE 'A%';
+
+
+3. Dificuldades e observações
+
+Exercício 3 — Relacionamento entre consultas
+Minha observação: A dificuldade estava em entender como relacionar a consulta externa com a subconsulta. A comparação inicial utilizava o total gasto para identificar o cliente, mas o correto era comparar os IDs. Também foi necessário entender que o INNER JOIN pode ser utilizado dentro da CTE para relacionar clientes e pedidos.
+Minha reflexão: Eu não sabia como fazer a ligação dentro do WHERE da subconsulta e tive dúvidas se poderia utilizar INNER JOIN dentro do WITH.
+
+Exercício 4 — UNION na mesma tabela
+Minha observação: A dificuldade estava em compreender que o UNION pode combinar resultados de consultas feitas na mesma tabela, desde que cada consulta tenha seus próprios filtros. Também foi necessário distinguir quando a tabela Pedidos era necessária e quando bastava consultar Clientes.
+
+Minha reflexão: Eu pensava que só poderia usar UNION entre tabelas diferentes. Tentei relacionar o nome do cliente com a tabela Pedidos por meio de uma subconsulta, mas não sabia como estruturar essa condição.
