@@ -30,9 +30,12 @@ Em cada pasta de diário (`Dia 1`, `Dia 2`, etc.), você verá:
 | [Dia 2](./Semana%201/Dia-2.txt) | Revisão (`IN`, `CASE`) + Introdução a `Subqueries` | ✅ Concluído |
 | [Dias 3 e 4](./Semana%201/Dia-3-4.txt) | Subqueries Avançadas / Prática | ✅ Concluído |
 | [Dia 5](./Semana%201/Dia-5.txt) | `JOIN`, `INNER JOIN`, `OUTER JOIN`, `LEFT` e `RIGHT JOIN` | ✅ Concluído |
-| [Dia 6](./Semana%201/Dia-6.txt) | `Joins`, `Having`, `Group by` | ✅ Concluído |
-| [Dia 7](./Semana%201/Dia-7.txt) | 'JOINs', 'GROUP BY', 'HAVING', 'COUNT()', 'SUM()' e 'COALESCE()' | ✅ Concluído |
-| [Dia 8](./Semana%202/Dia-8.txt) | 'CTE (Common Table Expression)' — 'WITH' | ✅ Concluído |
-| [Dia 9](./Semana%201/Dia-9.txt) | [Preencher tópicos do dia 9] | ⏳ |
----
+| [Dia 6](./Semana%201/Dia-6.txt) | `JOINs`, `HAVING`, `GROUP BY` | ✅ Concluído |
+| [Dia 7](./Semana%201/Dia-7.txt) | `JOINs`, `GROUP BY`, `HAVING`, `COUNT()`, `SUM()` e `COALESCE()` | ✅ Concluído |
+| [Dia 8](./Semana%202/Dia-8.txt) | `CTE (Common Table Expression)` — `WITH` | ✅ Concluído |
+| [Dia 9](./Semana%202/Dia-9.txt) | `EXISTS`, `NOT EXISTS`, `UNION` e Subqueries Correlacionadas | ✅ Concluído |
+| [Dia 10](./Semana%202/Dia-10.txt) | Revisão: `EXISTS`, `NOT EXISTS`, `AVG()`, Subqueries Aninhadas, `IN`, `LIKE` e `UNION` | ✅ Concluído |
+| [Dia 11](./Semana%202/Dia-11.txt) |  | ⏳ Pendente |
+
+
 > *"Constconstância vence a intensidade."* 🚀 Acompanhe a jornada!
