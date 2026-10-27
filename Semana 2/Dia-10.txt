@@ -1,0 +1,84 @@
+# Diário de Estudos — Dia 10
+
+**Data:** 27/10/2026  
+**Horário:** 10h20–11h40  
+**Duração:** 1h20  
+**Tipo de sessão:** Revisão (*remember*)  
+**Material:** Exercícios práticos e revisão das consultas SQL anteriores.
+
+## Conteúdos revisados
+- `EXISTS` e `NOT EXISTS`
+- Subconsultas correlacionadas e aninhadas
+- `AVG()` em subconsultas
+- `IN` e `LIKE`
+- `UNION` e eliminação de duplicatas
+- Diferenças entre `AND`, `OR` e `UNION`
+- Sintaxe SQL e uso de aspas em valores textuais
+
+## Exercícios e tentativas
+
+**1. Clientes sem pedidos acima de R$ 250 — Correto**
+SELECT nome
+FROM Clientes
+WHERE NOT EXISTS (
+    SELECT cliente_id
+    FROM Pedidos
+    WHERE Pedidos.cliente_id = Clientes.id
+      AND valor > 250);
+
+Usou `NOT EXISTS` para selecionar clientes que não possuem pedidos acima do valor indicado.
+
+**2. Clientes com pelo menos um pedido abaixo da média — Correto**
+SELECT nome
+FROM Clientes
+WHERE EXISTS (
+    SELECT cliente_id
+    FROM Pedidos
+    WHERE Pedidos.cliente_id = Clientes.id
+      AND valor < (SELECT AVG(valor) FROM Pedidos));
+
+Usou `EXISTS` e uma subconsulta com `AVG(valor)`. Entendeu que a média geral é calculada separadamente e utilizada como referência para comparar os pedidos.
+
+**3. Diagnóstico de erro lógico — Correto**
+SELECT nome
+FROM Clientes
+WHERE EXISTS (
+    SELECT cliente_id
+    FROM Pedidos
+    WHERE Pedidos.cliente_id = Clientes.id
+      AND valor > (SELECT AVG(valor) FROM Pedidos)
+);
+
+Identificou que o operador `>` contrariava o enunciado, que solicitava pedidos abaixo da média. Indicou corretamente a troca para `<`.
+
+**4. Clientes sem pedidos abaixo da média — Correto**
+SELECT nome
+FROM Clientes
+WHERE NOT EXISTS (
+    SELECT cliente_id
+    FROM Pedidos
+    WHERE Pedidos.cliente_id = Clientes.id
+      AND valor < (SELECT AVG(valor) FROM Pedidos)
+);
+
+Usou `NOT EXISTS` e explicou corretamente que ele verifica se a subconsulta não retorna nenhuma linha que satisfaça as condições. Identificou que Ana seria a única cliente retornada, pois não possui pedidos.
+
+**5. Combinação de resultados com `UNION` — Parcialmente consolidado**
+SELECT nome FROM Clientes
+WHERE id IN(SELECT cliente_id FROM Pedidos 
+            WHERE Pedidos.cliente_id = Clientes.id)
+UNION
+SELECT nome FROM Clientes
+WHERE nome LIKE 'A%';
+
+
+Montou a estrutura com dois `SELECT`, usando `IN` para identificar clientes com pedidos e `LIKE 'A%'` para filtrar nomes iniciados por A. Corrigiu a subconsulta do `IN` para retornar somente `Pedidos.cliente_id`.
+
+**Observação do assistente:** houve dificuldade inicial com a quantidade de colunas retornadas pelo `IN`, a escolha dos operadores e as aspas para valores textuais.
+
+**Reflexão do aluno:** percebeu erros no uso de aspas duplas em vez de simples e na escolha de `EXISTS`. Demonstrou dificuldade para diferenciar a combinação de resultados com `UNION` da exigência de condições simultâneas com `AND`.
+
+
+## Resumo da sessão
+
+Sessão de retomada com 1h20 de duração. Os exercícios com `EXISTS`, `NOT EXISTS` e `AVG()` foram resolvidos corretamente. O principal ponto a consolidar é a lógica de combinação de resultados com `UNION` e sua diferença em relação aos operadores lógicos. O aluno demonstrou capacidade de identificar erros e ajustar consultas a partir de pistas.
