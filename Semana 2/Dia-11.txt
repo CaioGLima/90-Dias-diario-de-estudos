@@ -1,0 +1,136 @@
+Diário de Estudos — Dia 11
+
+Data: 29/10/2026
+Horário: 09:40–10:50
+Duração: 1h10
+Tipo de sessão: Breve revisão + funções de janela (OVER, PARTITION BY, ROW_NUMBER, LAG e LEAD)
+Material: DIO, DataCamp e exercícios práticos com as tabelas Clientes e Pedidos
+
+1. Conteúdo estudado
+Funções de janela — OVER()
+A cláusula OVER() permite executar cálculos considerando um conjunto de linhas relacionadas, sem necessariamente agrupar essas linhas em uma única linha, como acontece com GROUP BY.
+Sintaxe:
+<funcao> OVER (
+    PARTITION BY <coluna1>, <coluna2>
+    ORDER BY <coluna>
+)
+
+PARTITION BY: divide as linhas em grupos para realizar cálculos independentes.
+ORDER BY: define a ordem utilizada pela função de janela.
+Pode ser utilizada com funções como SUM(), AVG(), ROW_NUMBER(), LAG() e LEAD().
+
+ROW_NUMBER()
+Atribui um número sequencial único a cada linha, respeitando a ordenação definida no OVER().
+Quando combinado com PARTITION BY, reinicia a numeração para cada grupo.
+
+LAG() e LEAD()
+LAG(): acessa um valor de uma linha anterior, conforme a ordenação definida.
+LEAD(): acessa um valor de uma próxima linha.
+Quando não existe uma linha anterior ou seguinte, respectivamente, retornam NULL por padrão.
+
+CAST()
+Converte um valor para um tipo de dado especificado. Por exemplo, CAST(valor AS DECIMAL(5,2)) converte o valor para um decimal com até cinco dígitos no total, sendo dois deles após a vírgula.
+ROUND()
+Arredonda um valor numérico para a quantidade de casas decimais indicada. Por exemplo, ROUND(33.3333, 2) retorna 33.33.
+Diferença: ROUND() arredonda o valor; CAST() converte o tipo de dado e, nesse caso, ajuda a controlar a precisão e a escala do resultado.
+
+2. Exercícios realizados
+
+Exercício 1 — Aquecimento: agregações com GROUP BY e HAVING -->
+Utilizando as tabelas Clientes e Pedidos, escreva uma consulta que mostre o nome de cada cliente, a quantidade de pedidos realizados e o valor total gasto.
+Retorne somente os clientes que realizaram pelo menos 2 pedidos e gastaram mais de R$ 400 no total.
+
+SELECT c.nome, COUNT(p.id), SUM(p.valor)
+FROM Clientes c
+INNER JOIN Pedidos p ON c.id = p.cliente_id
+GROUP BY c.id, c.nome
+HAVING COUNT(p.id) >= 2 AND SUM(p.valor) > 400;
+
+
+Exercício 2 — Ranking de pedidos com ROW_NUMBER() -->
+Escreva uma consulta que liste o nome do cliente, o ID do pedido, o valor do pedido e a posição desse pedido entre os pedidos do próprio cliente.
+A posição deve ser definida pelo valor do pedido, do maior para o menor. A numeração deve reiniciar para cada cliente, e todos os pedidos devem continuar aparecendo no resultado.
+
+SELECT c.nome, p.id, p.valor,
+       ROW_NUMBER() OVER(
+           PARTITION BY c.id
+           ORDER BY p.valor DESC
+       ) AS Posicao
+FROM Clientes c
+INNER JOIN Pedidos p ON c.id = p.cliente_id;
+
+
+Exercício 3 — Maior pedido de cada cliente usando CTE -->
+Utilizando ROW_NUMBER() e uma CTE (WITH), escreva uma consulta que retorne somente o pedido de maior valor de cada cliente.-
+O resultado deve mostrar o nome do cliente, o ID do pedido e o valor do pedido.
+
+WITH PedidosNumerados AS (
+    SELECT
+        c.nome,
+        c.id AS cliente_id,
+        p.id AS pedido_id,
+        p.valor,
+        ROW_NUMBER() OVER (
+            PARTITION BY c.id
+            ORDER BY p.valor DESC
+        ) AS posicao
+    FROM Clientes c
+    INNER JOIN Pedidos p ON c.id = p.cliente_id
+)
+SELECT nome, pedido_id, valor
+FROM PedidosNumerados
+WHERE posicao = 1;
+
+
+Exercício 4 — Percentual de cada pedido em relação ao total do cliente -->
+Escreva uma consulta que mostre o nome do cliente, o ID do pedido, o valor do pedido, o total gasto pelo cliente e o percentual que aquele pedido representa em relação ao total gasto pelo próprio cliente.
+Utilize uma função de janela para calcular o total por cliente, sem agrupar os pedidos em uma única linha. Utilize uma CTE para organizar a consulta e apresente o percentual com duas casas decimais.
+
+WITH TotaisClientes AS (
+    SELECT
+        c.nome,
+        p.id,
+        p.valor,
+        SUM(p.valor) OVER(
+            PARTITION BY c.id
+        ) AS total_cliente
+    FROM Clientes c
+    INNER JOIN Pedidos p ON c.id = p.cliente_id
+)
+SELECT
+    nome,
+    id,
+    valor,
+    total_cliente,
+    CAST(
+        ROUND(valor * 100.0 / total_cliente, 2)
+        AS DECIMAL(5,2)
+    ) AS Percentual_do_total
+FROM TotaisClientes;
+
+
+Exercício 5 — Comparação com o pedido anterior usando LAG() -->
+Escreva uma consulta que mostre o nome do cliente, o ID do pedido, o valor do pedido e o valor do pedido anterior daquele mesmo cliente.
+Utilize LAG() para recuperar o valor anterior, considerando os pedidos em ordem crescente de ID. O primeiro pedido de cada cliente deverá retornar NULL na coluna do pedido anterior
+
+SELECT
+    c.nome,
+    p.id,
+    p.valor,
+    LAG(p.valor) OVER(
+        PARTITION BY c.id
+        ORDER BY p.id ASC
+    ) AS valor_pedido_anterior
+FROM Clientes c
+INNER JOIN Pedidos p ON c.id = p.cliente_id;
+
+
+3. Dificuldades e pontos de atenção
+Inicialmente, houve dificuldade para calcular o percentual do pedido: a divisão foi invertida, usando o total do cliente dividido pelo valor do pedido. A fórmula foi corrigida para valor * 100.0 / total_cliente.
+Houve dúvida sobre a exibição de casas decimais. Foi esclarecida a diferença entre ROUND() e CAST().
+Foi necessário distinguir o valor do pedido anterior da posição do pedido ao nomear a coluna produzida por LAG().
+Foi reforçada a diferença entre GROUP BY, que agrupa linhas, e funções de janela, que preservam as linhas individuais no resultado.
+
+4. Resumo da sessão
+A sessão consolidou o uso de funções de janela em consultas SQL. Os cinco exercícios foram concluídos corretamente, com necessidade de orientação em alguns pontos de sintaxe e raciocínio.
+O principal aprendizado foi compreender como calcular totais por cliente sem perder os pedidos individuais, criar rankings, filtrar resultados de funções de janela por meio de uma CTE e comparar linhas consecutivas com LAG().
