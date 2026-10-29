@@ -35,7 +35,8 @@ Em cada pasta de diário (`Dia 1`, `Dia 2`, etc.), você verá:
 | [Dia 8](./Semana%202/Dia-8.txt) | `CTE (Common Table Expression)` — `WITH` | ✅ Concluído |
 | [Dia 9](./Semana%202/Dia-9.txt) | `EXISTS`, `NOT EXISTS`, `UNION` e Subqueries Correlacionadas | ✅ Concluído |
 | [Dia 10](./Semana%202/Dia-10.txt) | Revisão: `EXISTS`, `NOT EXISTS`, `AVG()`, Subqueries Aninhadas, `IN`, `LIKE` e `UNION` | ✅ Concluído |
-| [Dia 11](./Semana%202/Dia-11.txt) |  | ⏳ Pendente |
+| [Dia 11](./Semana%202/Dia-11.txt) | Revisão de Agregações, Funções de Janela `(OVER, PARTITION BY, ROW_NUMBER, LAG, LEAD)`, `CTEs`, `CAST()` e `ROUND()` | ✅ Concluído |
+| [Dia 12](./Semana%202/Dia-12.txt) | `RANK()`, `DENSE_RANK()` e Comparação de Rankings | ⏳ Pendente |
 
 
 > *"Constconstância vence a intensidade."* 🚀 Acompanhe a jornada!
