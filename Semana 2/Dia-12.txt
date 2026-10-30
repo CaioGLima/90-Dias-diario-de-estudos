@@ -1,0 +1,177 @@
+Diário de Estudos — Dia 11
+
+Data: 30/10/2026
+Horário: 11:30 – 12:20
+Duração: 50 minutos
+Material utilizado: GeeksforGeeks
+Tipo de estudo: Aprendizado, revisão e prática de funções de classificação.
+
+1. Conteúdo estudado
+
+RANK() e DENSE_RANK()
+São funções de classificação utilizadas para atribuir posições às linhas de um conjunto de resultados, considerando critérios específicos de ordenação.
+
+RANK()
+Atribui uma posição ou classificação a cada linha. Quando duas ou mais linhas compartilham os mesmos valores de ordenação, elas recebem a mesma classificação.
+Observação: a classificação considera a quantidade de linhas. Se o 2º e o 3º lugares tiverem o mesmo valor, ambos receberão a posição 2, mas o próximo será o 4º lugar.
+
+Sintaxe:
+RANK() OVER (
+    PARTITION BY coluna1, coluna2, ...
+    ORDER BY coluna
+)
+
+DENSE_RANK()
+Funciona de maneira semelhante ao RANK(), mas evita lacunas na classificação, mantendo uma sequência contínua de posições.
+Observação: se o 2º e o 3º lugares tiverem o mesmo valor, ambos receberão a posição 2. O próximo será classificado como 3º lugar.
+
+Sintaxe:
+DENSE_RANK() OVER (
+    PARTITION BY coluna1, coluna2, ...
+    ORDER BY coluna
+)
+
+2. Exercícios práticos — SQL
+
+Exercício 1 — Classificação dos pedidos por cliente
+Enunciado:
+Liste todos os pedidos, apresentando:
+Nome do cliente;
+ID do pedido;
+Valor do pedido;
+Posição utilizando RANK();
+Posição utilizando DENSE_RANK().
+
+Regras:
+O ranking deve ser separado por cliente.
+O maior pedido deve ocupar a primeira posição.
+Pedidos com valores iguais devem receber a mesma classificação.
+
+Resolução:
+SELECT
+    c.nome,
+    p.id,
+    p.valor,
+    RANK() OVER (
+        PARTITION BY c.id
+        ORDER BY p.valor DESC
+    ) AS ranking,
+    DENSE_RANK() OVER (
+        PARTITION BY c.id
+        ORDER BY p.valor DESC
+    ) AS ranking_denso
+FROM Clientes c
+INNER JOIN Pedidos p
+    ON c.id = p.cliente_id;
+
+Exercício 2 — Segundo maior pedido por cliente
+Enunciado:
+Utilizando DENSE_RANK() e uma CTE, encontre o segundo maior valor de pedido de cada cliente.
+Apresente:
+Nome do cliente;
+ID do pedido;
+Valor do pedido.
+
+Regras:
+O ranking deve ser separado por cliente.
+O maior valor recebe posição 1.
+Valores iguais devem ser considerados como uma única posição.
+Retorne somente os pedidos classificados na posição 2.
+
+Resolução:
+WITH PedidosRankiados AS (
+    SELECT
+        c.nome,
+        c.id AS cliente_id,
+        p.id AS pedido_id,
+        p.valor,
+        DENSE_RANK() OVER (
+            PARTITION BY c.id
+            ORDER BY p.valor DESC
+        ) AS posicao
+    FROM Clientes c
+    INNER JOIN Pedidos p
+        ON c.id = p.cliente_id
+)
+SELECT nome, pedido_id, valor
+FROM PedidosRankiados
+WHERE posicao = 2;
+
+Observação: clientes que possuem somente pedidos com o mesmo valor não aparecem, pois não possuem um segundo valor distinto.
+
+Exercício 3 — Diferença entre RANK() e DENSE_RANK()
+Enunciado:
+Considere a seguinte classificação de vendas:
+Ana: 1000
+Bruno: 900
+Carlos: 900
+Daniela: 800
+
+Determine as posições de cada vendedor utilizando RANK() e DENSE_RANK().
+Resposta:
+
+Vendedor   RANK()   DENSE_RANK()
+Ana          1          1
+Bruno        2          2
+Carlos       2          2
+Daniela      4          3
+
+
+Exercício 4 — Interpretação de empates
+Enunciado:
+Um cliente possui três pedidos:
+Pedido 10: R$ 300
+Pedido 11: R$ 300
+Pedido 12: R$ 150
+
+Determine as posições de cada pedido utilizando RANK() e DENSE_RANK().
+Resposta corrigida:
+
+Pedido   Valor   RANK()   DENSE_RANK()
+10       300       1          1
+11       300       1          1
+12       150       3          2
+
+
+Exercício 5 — Segundo maior pedido
+Enunciado:
+Imagine que precisamos encontrar o segundo maior valor de pedido de cada cliente, considerando pedidos de mesmo valor como empatados.
+Qual função seria mais adequada: ROW_NUMBER(), RANK() ou DENSE_RANK()? Explique o motivo.
+
+Resposta:
+O usuário identificou que ROW_NUMBER() classificaria cada linha individualmente, enquanto DENSE_RANK() agruparia valores iguais na mesma posição e manteria uma sequência sem lacunas.
+Correção: DENSE_RANK() é a escolha adequada quando queremos encontrar o segundo maior valor distinto, considerando os empates.
+
+Exercício 6 — Comparação das três funções
+Enunciado:
+Considere os seguintes pedidos:
+Pedido 20: R$ 700
+Pedido 21: R$ 500
+Pedido 22: R$ 500
+Pedido 23: R$ 300
+Pedido 24: R$ 100
+
+Determine quais pedidos seriam retornados em cada situação:
+ROW_NUMBER() = 2
+RANK() = 2
+DENSE_RANK() = 2
+
+Resposta:
+ROW_NUMBER() = 2
+Resultado: Pedido 21
+RANK() = 2
+Resultado: Pedidos 21 e 22
+DENSE_RANK() = 2
+Resultado: Pedidos 21 e 22
+
+Exercício 7 — Premiação dos vendedores
+Enunciado:
+Uma empresa deseja premiar os três maiores vendedores, mas todos os vendedores empatados na terceira posição também devem receber o prêmio.
+Qual função seria mais adequada: ROW_NUMBER(), RANK() ou DENSE_RANK()? Explique.
+
+Resposta inicial:
+O usuário escolheu ROW_NUMBER(), argumentando que a função poderia utilizar outra métrica, como nome ou ID, para diferenciar os registros.
+
+Correção:
+A função adequada é RANK(), pois permite que todos os vendedores empatados na terceira posição sejam premiados.
+ROW_NUMBER() atribuiria posições individuais e poderia excluir um vendedor empatado. DENSE_RANK() também incluiria os empatados nesse cenário, mas sua regra de classificação é diferente quando existem empates anteriores.
