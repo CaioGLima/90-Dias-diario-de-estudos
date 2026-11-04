@@ -1,0 +1,163 @@
+Dia 13 — Revisão de Funções de Janela
+
+Data: 04/11/2026
+Duração: 10:20 - 11h
+Tipo de estudo: Revisão prática e integração de funções de janela.
+
+1. Conteúdo revisado
+SUM() OVER (PARTITION BY)
+LAG() e LEAD()
+ROW_NUMBER()
+RANK() e DENSE_RANK()
+PARTITION BY
+ORDER BY ASC e DESC
+Combinação de diferentes funções de janela em uma mesma consulta.
+
+2. Exercícios práticos — SQL
+Exercício 1 — Total gasto e pedido anterior
+Enunciado:
+Uma empresa deseja gerar um relatório contendo:
+Nome do cliente;
+ID do pedido;
+Valor do pedido;
+Total gasto pelo cliente em todos os pedidos;
+Valor do pedido anterior daquele cliente.
+
+Regras:
+Não agrupar os pedidos em uma única linha por cliente.
+O total deve aparecer repetido em todos os pedidos daquele cliente.
+O pedido anterior deve ser identificado pelo ID do pedido.
+O primeiro pedido de cada cliente deve apresentar NULL no valor anterior.
+
+Resolução:
+
+SELECT
+    c.nome,
+    p.id,
+    p.valor,
+    SUM(p.valor) OVER (
+        PARTITION BY c.id
+    ) AS total_gasto,
+    LAG(p.valor) OVER (
+        PARTITION BY c.id
+        ORDER BY p.id ASC
+    ) AS valor_pedido_anterior
+FROM Clientes c
+INNER JOIN Pedidos p
+    ON c.id = p.cliente_id;
+
+
+Exercício 2 — Diagnóstico de ordenação com LEAD()
+Enunciado:
+Imagine que alguém escreveu:
+
+LEAD(p.valor) OVER (
+    PARTITION BY c.id
+    ORDER BY p.id DESC
+)
+
+A intenção era descobrir o valor do próximo pedido cronologicamente, ou seja, do pedido com ID imediatamente maior.
+Identifique o problema e explique como corrigir.
+
+Resposta:
+
+O problema está na ordenação. O ORDER BY p.id DESC organiza os pedidos do maior ID para o menor.
+Como queremos encontrar o próximo pedido cronologicamente, devemos utilizar ASC.
+
+Correção:
+
+LEAD(p.valor) OVER (
+    PARTITION BY c.id
+    ORDER BY p.id ASC
+)
+
+Aprendizado: LEAD() acessa a próxima linha da sequência definida pelo ORDER BY. A ordenação determina o que será considerado próximo.
+
+Exercício 3 — Integração de funções de janela
+Enunciado:
+Uma empresa quer um relatório contendo:
+Nome do cliente;
+ID do pedido;
+Valor do pedido;
+Total gasto pelo cliente;
+Posição do pedido dentro do cliente, do maior para o menor;
+Valor do pedido anterior, considerando o ID em ordem crescente.
+
+Regras:
+Não agrupar os pedidos em uma única linha.
+Utilizar SUM() OVER().
+Utilizar DENSE_RANK().
+Utilizar LAG().
+
+Resolução:
+
+SELECT
+    c.nome,
+    p.id,
+    p.valor,
+    SUM(p.valor) OVER (
+        PARTITION BY c.id
+    ) AS total_gasto,
+    DENSE_RANK() OVER (
+        PARTITION BY c.id
+        ORDER BY p.valor DESC
+    ) AS posicao_pedido,
+    LAG(p.valor) OVER (
+        PARTITION BY c.id
+        ORDER BY p.id ASC
+    ) AS valor_pedido_anterior
+FROM Clientes c
+INNER JOIN Pedidos p
+    ON c.id = p.cliente_id;
+
+Observação: inicialmente, o ranking foi ordenado pelo ID do pedido, mas o enunciado solicitava classificação pelo valor. O ajuste foi realizado utilizando p.valor DESC.
+
+3. Questionários — interpretação e diagnóstico
+Questionário 1 — Comportamento do LEAD()
+Enunciado:
+
+Considere os pedidos de João:
+Pedido 10: R$ 150
+Pedido 11: R$ 300
+Pedido 12: R$ 500
+
+Se utilizarmos:
+
+LEAD(p.valor) OVER (
+    PARTITION BY c.id
+    ORDER BY p.id ASC
+)
+
+Qual valor aparecerá na linha do pedido 10? E qual valor aparecerá na linha do pedido 12?
+
+Resposta inicial:
+Pedido 10: NULL.
+Pedido 12: R$ 300.
+
+Correção:
+
+Pedido 10: R$ 300
+Pedido 11: R$ 500
+Pedido 12: NULL
+
+Aprendizado: o LEAD() acessa o próximo registro. O último registro da sequência não possui próximo valor e, portanto, retorna NULL.
+
+Questionário 2 — Interpretação do ORDER BY
+
+Enunciado:
+Por que não devemos obrigatoriamente utilizar o mesmo ORDER BY em todas as funções de janela de uma consulta?
+
+Resposta:
+Cada função possui uma finalidade diferente:
+DENSE_RANK(): combina melhor com a variação dos valores, pois queremos classificar os pedidos pelo valor.
+LAG(): utiliza a cronologia dos IDs para identificar o pedido anterior.
+SUM(): como queremos apenas a soma total dos valores, não precisamos de ordenação neste caso.
+
+Observação complementar: SUM() também pode utilizar ORDER BY quando queremos calcular uma soma acumulada. Neste exercício, a ordenação não era necessária porque o objetivo era obter o total completo por cliente.
+
+4. Dificuldades e observações
+
+Dúvida inicial sobre quando utilizar ASC ou DESC nas funções LAG() e LEAD().
+Necessidade de reforçar que o ORDER BY determina a sequência percorrida pelas funções de janela.
+Ajuste na ordenação do DENSE_RANK(), utilizando o valor do pedido em vez do ID.
+Boa evolução na interpretação dos requisitos e na escolha das funções adequadas.
