@@ -37,7 +37,8 @@ Em cada pasta de diário (`Dia 1`, `Dia 2`, etc.), você verá:
 | [Dia 10](./Semana%202/Dia-10.txt) | Revisão: `EXISTS`, `NOT EXISTS`, `AVG()`, Subqueries Aninhadas, `IN`, `LIKE` e `UNION` | ✅ Concluído |
 | [Dia 11](./Semana%202/Dia-11.txt) | Revisão de Agregações, Funções de Janela `(OVER, PARTITION BY, ROW_NUMBER, LAG, LEAD)`, `CTEs`, `CAST()` e `ROUND()` | ✅ Concluído |
 | [Dia 12](./Semana%202/Dia-12.txt) | `RANK()`, `DENSE_RANK()` e Comparação de Rankings | ✅ Concluído |
-| [Dia 13](./Semana%202/Dia-13.txt) |  | ⏳ Pendente |
+| [Dia 13](./Semana%202/Dia-13.txt) |  Revisão prática e integração de funções de janela. | ✅ Concluído |
+| [Dia 14](./Semana%202/Dia-14.txt) |  | ⏳ Pendente |
 
 
 > *"Constconstância vence a intensidade."* 🚀 Acompanhe a jornada!
