@@ -1,0 +1,218 @@
+# Diário de Estudos SQL — Dia 15
+
+**Data:** 09/11/2026  
+**Horário:** Aproximadamente 10:57 às 11:48  
+**Duração:** Aproximadamente 51m  
+**Material:** Prática com SQL Server — database de vendas desenvolvida durante os estudos.
+
+## 1. Conteúdos estudados
+
+- Relacionamentos entre tabelas utilizando INNER JOIN.
+- Relacionamentos entre Primary Keys (PK) e Foreign Keys (FK).
+- Consultas envolvendo múltiplas tabelas.
+- Cálculos com expressões matemáticas no SELECT.
+- Funções de agregação: SUM() e COUNT().
+- Agrupamento de registros com GROUP BY.
+- Filtragem com WHERE e HAVING.
+- COUNT(DISTINCT) e duplicação de registros causada por JOIN.
+- Preservação de valores históricos em bancos de dados.
+
+## 2. Exercícios e perguntas
+
+### Exercício 1 — Preço histórico dos produtos
+
+**Pergunta:** Por que a tabela ItensPedidos armazena preco_unitario se a tabela Produtos já possui uma coluna preco?
+
+**Resposta:** Porque ItensPedidos permite visualizar cada item separadamente e registrar os valores praticados na compra.
+
+**Complementação:** O preco_unitario registra o preço histórico da venda. Isso evita que alterações futuras no preço cadastrado em Produtos modifiquem o valor de compras antigas.
+
+**Exemplo:**
+- Preço atual do produto: R$ 250.
+- Preço praticado na compra: R$ 230.
+- Preço futuro após reajuste: R$ 280.
+
+O pedido antigo continua registrando R$ 230 por unidade.
+
+### Exercício 2 — Cálculo do valor de um item
+
+**Pergunta:** João comprou dois mouses por R$ 110 cada, com R$ 10 de desconto. Qual é o valor final?
+
+**Resposta:** R$ 210.
+
+```sql
+(2 * 110) - 10 = 210
+```
+
+**Pergunta complementar:** Se o preço atual do mouse aumentar para R$ 150, qual preço deve aparecer na compra antiga?
+
+**Resposta:** R$ 110 por unidade, pois era o preço praticado no momento da compra.
+
+### Exercício 3 — JOIN entre quatro tabelas
+
+**Objetivo:** Criar um relatório contendo cliente, data do pedido, produto, quantidade e preço unitário.
+
+**Primeira tentativa:**
+
+```sql
+SELECT c.nome, pd.data_pedido, pr.nome, it.quantidade, it.preco_unitario
+FROM Pedidos pd
+INNER JOIN Clientes c ON c.id = pr.cliente_id
+Produtos pr ON pr.id = it.produto_id
+ItensPedidos it ON it.id = pd.id
+```
+
+**Dificuldades identificadas:**
+- Utilização de uma coluna pertencente à tabela errada.
+- Ausência do INNER JOIN em algumas ligações.
+- Relacionamento incorreto entre IDs.
+- Confusão sobre a direção da comparação no ON.
+
+**Consulta corrigida:**
+
+```sql
+SELECT c.nome, pd.data_pedido, pr.nome, it.quantidade, it.preco_unitario
+FROM Pedidos pd
+INNER JOIN Clientes c ON c.id = pd.cliente_id
+INNER JOIN ItensPedidos it ON pd.id = it.pedido_id
+INNER JOIN Produtos pr ON pr.id = it.produto_id;
+```
+
+**Aprendizado:** O ON conecta as colunas que representam o mesmo relacionamento. Não existe obrigação de começar pela PK ou pela FK.
+
+Estas duas condições são equivalentes:
+
+```sql
+ON c.id = pd.cliente_id
+```
+
+```sql
+ON pd.cliente_id = c.id
+```
+
+### Exercício 4 — Cálculo do valor total
+
+**Objetivo:** Calcular o valor total de todos os itens dos pedidos.
+
+**Primeira tentativa:** Foi utilizada a função SUM() junto com diversas colunas individuais no SELECT, gerando conflito com as regras de agrupamento.
+
+**Consulta enviada:**
+
+```sql
+SELECT SUM(ip.quantidade * ip.preco_unitario - ip.desconto) AS total_gasto
+FROM Pedidos pd
+INNER JOIN Clientes c ON c.id = pd.cliente_id
+INNER JOIN ItensPedidos ip ON pd.id = ip.pedido_id
+INNER JOIN Produtos pr ON pr.id = ip.produto_id;
+```
+
+**Aprendizado:** SUM() agrega os valores das linhas. Quando queremos mostrar colunas individuais junto com agregações, precisamos definir corretamente o agrupamento com GROUP BY.
+
+Também foi identificado que os JOINs com Clientes e Produtos eram desnecessários para calcular somente o total geral.
+
+### Exercício 5 — Total gasto por cliente
+
+**Objetivo:** Calcular quanto cada cliente gastou.
+
+**Consulta enviada:**
+
+```sql
+SELECT c.nome, SUM(ip.quantidade * ip.preco_unitario - ip.desconto) AS total_gasto
+FROM Pedidos pd
+INNER JOIN Clientes c ON c.id = pd.cliente_id
+INNER JOIN ItensPedidos ip ON pd.id = ip.pedido_id
+INNER JOIN Produtos pr ON pr.id = ip.produto_id
+GROUP BY c.id, c.nome;
+```
+
+**Aprendizado:**
+- SUM() calcula o total.
+- GROUP BY agrupa os registros por cliente.
+- Agrupar também pelo ID evita misturar clientes diferentes que tenham o mesmo nome.
+- JOIN com Produtos não era necessário nesse cálculo específico.
+
+### Exercício 6 — Considerar somente pedidos concluídos
+
+**Objetivo:** Calcular o total gasto por cliente considerando apenas pedidos concluídos.
+
+**Consulta enviada:**
+
+```sql
+SELECT
+    c.id,
+    c.nome,
+    SUM(ip.quantidade * ip.preco_unitario - ip.desconto) AS total_gasto
+FROM Clientes c
+INNER JOIN Pedidos pd ON pd.cliente_id = c.id
+INNER JOIN ItensPedidos ip ON ip.pedido_id = pd.id
+WHERE pd.status = 'Concluído'
+GROUP BY c.id, c.nome;
+```
+
+**Aprendizado:** WHERE filtra os registros antes do agrupamento. Nesse caso, pedidos pendentes e cancelados são removidos antes do cálculo dos totais.
+
+### Exercício 7 — Filtragem com HAVING e COUNT(DISTINCT)
+
+**Objetivo:** Mostrar somente clientes que:
+- Possuem pelo menos dois pedidos concluídos.
+- Gastaram mais de R$ 500 nesses pedidos.
+
+**Consulta enviada:**
+
+```sql
+SELECT
+    c.id,
+    c.nome,
+    SUM(ip.quantidade * ip.preco_unitario - ip.desconto) AS total_gasto
+FROM Clientes c
+INNER JOIN Pedidos pd ON pd.cliente_id = c.id
+INNER JOIN ItensPedidos ip ON ip.pedido_id = pd.id
+WHERE pd.status = 'Concluído'
+GROUP BY c.id, c.nome
+HAVING
+    COUNT(DISTINCT pd.id) >= 2
+    AND SUM(ip.quantidade * ip.preco_unitario - ip.desconto) > 500;
+```
+
+**Aprendizado:**
+- WHERE filtra pedidos individuais.
+- GROUP BY agrupa os pedidos por cliente.
+- COUNT(DISTINCT pd.id) conta pedidos diferentes.
+- SUM() calcula o valor total.
+- HAVING filtra os grupos depois da agregação.
+- AND exige que as duas condições sejam verdadeiras.
+
+O uso de DISTINCT é importante porque um pedido pode possuir vários itens. Sem ele, COUNT(pd.id) poderia contar as linhas dos itens em vez dos pedidos.
+
+### Exercício 8 — Diagnóstico de duplicação após JOIN
+
+**Pergunta:** João possui três pedidos:
+- Pedido 1: três itens.
+- Pedido 2: dois itens.
+- Pedido 3: um item.
+
+Quantas linhas aparecem depois dos JOINs?
+
+**Resposta:** Seis linhas.
+
+| Expressão | Resultado |
+|---|---:|
+| COUNT(pd.id) | 6 |
+| COUNT(DISTINCT pd.id) | 3 |
+
+**Aprendizado:** Um JOIN pode multiplicar as linhas de uma tabela quando existe uma relação de um para muitos. Por isso, é necessário entender o que estamos contando.
+
+**Pergunta complementar:** João possui dois pedidos concluídos, mas gastou somente R$ 450. Ele aparece na consulta que exige dois pedidos e mais de R$ 500?
+
+**Resposta:** Não. Embora tenha dois pedidos, não atende à condição de valor mínimo.
+
+## 3. Dificuldades encontradas
+
+- Esquecimento temporário da estrutura de múltiplos INNER JOINs.
+- Confusão inicial na escolha das colunas utilizadas no ON.
+- Dificuldade inicial ao combinar SUM() com colunas individuais.
+- Necessidade de reforçar a diferença entre COUNT() e COUNT(DISTINCT).
+- Entender como a multiplicação de linhas causada por JOIN interfere nas agregações.
+
+**Resumo da sessão:** Boa evolução. Houve dificuldade inicial com JOINs, mas o raciocínio foi recuperado e aplicado em consultas progressivamente mais complexas. O foco da próxima sessão será fortalecer a interpretação dos resultados e a segurança na construção de consultas SQL.
+ 
