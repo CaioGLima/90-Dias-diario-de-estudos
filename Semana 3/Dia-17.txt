@@ -1,0 +1,213 @@
+# Diário de Estudos — Dia 17
+
+**Data:** 12/11/2026  
+**Horário:** 09:55 às 10:55  
+**Duração:** 1 hora  
+**Matéria:** SQL Server
+
+---
+
+## 1. Conteúdos estudados
+
+### CASE WHEN
+Permite criar condições dentro de uma consulta, retornando resultados diferentes conforme cada condição.
+
+**Estrutura:**
+```sql
+CASE
+    WHEN condição_1 THEN resultado_1
+    WHEN condição_2 THEN resultado_2
+    ELSE resultado_padrao
+END
+```
+
+**Exemplo:**
+```sql
+CASE
+    WHEN nota >= 7 THEN 'Aprovado'
+    ELSE 'Reprovado'
+END
+```
+
+Pode ser utilizado com funções de agregação, como `SUM()` e `COUNT()`, para realizar contagens e cálculos condicionais.
+
+### TICKET MÉDIO
+Representa quanto, em média, cada pedido gera de faturamento.
+
+**Fórmula:**
+Ticket Médio = Faturamento Total / Quantidade de Pedidos
+
+**Importante:** o ticket médio considera o valor total de cada pedido, e não a quantidade de itens. A média dos valores dos itens representa outra métrica.
+
+### NULLIF
+Compara dois valores e retorna `NULL` quando eles são iguais. Caso sejam diferentes, retorna o primeiro valor.
+É muito útil para evitar erros de divisão por zero.
+
+**Estrutura:**
+```sql
+NULLIF(valor_1, valor_2)
+```
+
+**Exemplo:**
+```sql
+SELECT 100 / NULLIF(quantidade, 0);
+```
+
+Se `quantidade` for zero, o divisor será `NULL`, evitando o erro de divisão por zero.
+
+### CAST
+Converte um valor de um tipo de dado para outro.
+
+**Estrutura:**
+```sql
+CAST(valor AS tipo_de_dado)
+```
+
+**Exemplo:**
+```sql
+CAST(valor AS DECIMAL(15,2))
+```
+
+Converte o valor para um número decimal com até 15 dígitos, sendo 2 casas decimais.
+É útil em cálculos financeiros para trabalhar com valores decimais.
+
+---
+
+## 2. Exercícios práticos
+
+### Exercício 1 — Agregação condicional por cliente
+**Objetivo:** contar pedidos de cada status por cliente utilizando `SUM(CASE WHEN...)`.
+
+```sql
+SELECT cliente_id,
+    SUM(CASE WHEN status = 'Concluído' THEN 1 ELSE 0 END) AS pedidos_concluidos,
+    SUM(CASE WHEN status = 'Pendente' THEN 1 ELSE 0 END) AS pedidos_pendentes,
+    SUM(CASE WHEN status = 'Cancelado' THEN 1 ELSE 0 END) AS pedidos_cancelados,
+    COUNT(*) AS total_pedidos
+FROM Pedidos
+GROUP BY cliente_id;
+```
+
+**Aprendizado:** o `CASE` retorna 1 quando a condição é verdadeira e 0 quando é falsa. O `SUM()` soma os resultados, permitindo contar registros que atendem a cada condição.
+
+
+### Exercício 2 — Agregação condicional com JOIN
+**Objetivo:** apresentar os resultados utilizando o nome dos clientes em vez de seus IDs.
+
+```sql
+SELECT c.nome,
+    SUM(CASE WHEN pd.status = 'Concluído' THEN 1 ELSE 0 END) AS pedidos_concluidos,
+    SUM(CASE WHEN pd.status = 'Pendente' THEN 1 ELSE 0 END) AS pedidos_pendentes,
+    SUM(CASE WHEN pd.status = 'Cancelado' THEN 1 ELSE 0 END) AS pedidos_cancelados,
+    COUNT(*) AS total_pedidos
+FROM Pedidos pd
+INNER JOIN Clientes c ON c.id = pd.cliente_id
+GROUP BY c.id, c.nome;
+```
+
+**Aprendizado:** ao utilizar uma coluna no `SELECT` que não está dentro de uma função de agregação, ela precisa estar no `GROUP BY`.
+
+
+### Exercício 3 — Filtro de grupos com HAVING
+**Objetivo:** apresentar somente clientes que possuem pelo menos 2 pedidos.
+
+```sql
+SELECT c.nome,
+    SUM(CASE WHEN pd.status = 'Concluído' THEN 1 ELSE 0 END) AS pedidos_concluidos,
+    SUM(CASE WHEN pd.status = 'Pendente' THEN 1 ELSE 0 END) AS pedidos_pendentes,
+    SUM(CASE WHEN pd.status = 'Cancelado' THEN 1 ELSE 0 END) AS pedidos_cancelados,
+    COUNT(*) AS total_pedidos
+FROM Pedidos pd
+INNER JOIN Clientes c ON c.id = pd.cliente_id
+GROUP BY c.id, c.nome
+HAVING COUNT(*) >= 2;
+```
+
+**Aprendizado:** `HAVING` filtra os grupos depois do agrupamento. Já o `WHERE` filtra registros antes do `GROUP BY`.
+
+
+### Exercício 4 — Relatório de desempenho dos clientes
+**Objetivo:** apresentar pedidos concluídos, pendentes, total de pedidos e faturamento por cliente.
+Requisitos:
+- Considerar pedidos de 2026.
+- Contar pedidos distintos.
+- Calcular faturamento somente dos pedidos concluídos.
+- Mostrar clientes com pelo menos 2 pedidos concluídos.
+- Ordenar pelo faturamento em ordem decrescente.
+
+```sql
+SELECT c.nome,
+    COUNT(DISTINCT CASE WHEN pd.status = 'Concluído' THEN pd.id END) AS pedidos_concluidos,
+    COUNT(DISTINCT CASE WHEN pd.status = 'Pendente' THEN pd.id END) AS pedidos_pendentes,
+    COUNT(DISTINCT pd.id) AS total_pedidos,
+    SUM(CASE WHEN pd.status = 'Concluído' THEN it.quantidade * it.preco_unitario - it.desconto ELSE 0 END) AS faturamento_total
+FROM Pedidos pd
+INNER JOIN Clientes c ON c.id = pd.cliente_id
+INNER JOIN ItensPedidos it ON pd.id = it.pedido_id
+WHERE pd.data_pedido >= '20260101' AND pd.data_pedido < '20270101'
+GROUP BY c.id, c.nome
+HAVING COUNT(DISTINCT CASE
+    WHEN pd.status = 'Concluído' THEN pd.id
+END) >= 2
+ORDER BY faturamento_total DESC;
+```
+
+**Dificuldades encontradas e aprendizados:**
+- O `JOIN` entre `Pedidos` e `ItensPedidos` pode multiplicar registros, pois um pedido pode possuir vários itens.
+- `COUNT(*)` conta as linhas resultantes do JOIN, não necessariamente os pedidos.
+- `COUNT(DISTINCT pd.id)` conta cada pedido apenas uma vez.
+- Para contar pedidos por status, foi utilizado `COUNT(DISTINCT CASE WHEN...)`.
+- Para calcular faturamento somente dos pedidos concluídos, foi utilizado `SUM(CASE WHEN...)`.
+
+
+### Exercício 5 — Relatório por forma de pagamento
+**Objetivo:** analisar o desempenho das formas de pagamento.
+Requisitos:
+- Considerar pedidos de 2026.
+- Contar pedidos concluídos e pendentes.
+- Calcular faturamento dos pedidos concluídos.
+- Calcular ticket médio.
+- Mostrar somente formas de pagamento com pelo menos 2 pedidos concluídos.
+- Ordenar pelo faturamento em ordem decrescente.
+
+```sql
+SELECT pd.forma_pagamento,
+    COUNT(DISTINCT CASE WHEN pd.status = 'Concluído' THEN pd.id END) AS pedidos_concluidos,
+    COUNT(DISTINCT CASE WHEN pd.status = 'Pendente' THEN pd.id END) AS pedidos_pendentes,
+    SUM(CASE WHEN pd.status = 'Concluído' THEN it.quantidade * it.preco_unitario - it.desconto ELSE 0 END) AS faturamento_total,
+    CAST(
+        SUM(CASE WHEN pd.status = 'Concluído' THEN it.quantidade * it.preco_unitario - it.desconto ELSE 0 END) AS DECIMAL(15,2))
+    / NULLIF(COUNT(DISTINCT CASE WHEN pd.status = 'Concluído' THEN pd.id END), 0) AS ticket_medio
+FROM Pedidos pd
+INNER JOIN ItensPedidos it ON pd.id = it.pedido_id
+WHERE pd.data_pedido >= '20260101' AND pd.data_pedido < '20270101'
+GROUP BY pd.forma_pagamento
+HAVING COUNT(DISTINCT CASE
+    WHEN pd.status = 'Concluído' THEN pd.id
+END) >= 2
+ORDER BY faturamento_total DESC;
+```
+
+**Aprendizados:**
+- O ticket médio é calculado dividindo o faturamento total pela quantidade de pedidos concluídos.
+- Não devemos calcular a média diretamente sobre os itens, pois pedidos podem ter quantidades diferentes de itens.
+- `CAST` foi utilizado para garantir o tipo decimal no cálculo.
+- `NULLIF` foi utilizado para evitar divisão por zero.
+- O `HAVING` garantiu que somente formas de pagamento com pelo menos 2 pedidos concluídos fossem exibidas.
+
+---
+
+## 3. Principais dificuldades do dia
+
+1. Entender a diferença entre `SUM()` e `COUNT()`.
+2. Identificar a multiplicação de registros causada pelos relacionamentos entre pedidos e itens.
+3. Diferenciar a contagem de linhas da contagem de pedidos distintos.
+4. Aplicar corretamente agregações condicionais.
+5. Entender o cálculo do ticket médio e sua diferença em relação à média por item.
+
+## 4. Resumo do aprendizado
+
+Neste dia, foram praticadas consultas com agregações condicionais utilizando `CASE WHEN`, combinadas com `SUM()`, `COUNT()` e `COUNT(DISTINCT)`.
+Também foram desenvolvidos relatórios comerciais envolvendo múltiplas tabelas, filtros com `WHERE` e `HAVING`, cálculos financeiros e ticket médio.
+O principal aprendizado foi compreender como os relacionamentos entre tabelas podem multiplicar registros durante um `JOIN`, exigindo atenção ao realizar contagens e agregações.
+
