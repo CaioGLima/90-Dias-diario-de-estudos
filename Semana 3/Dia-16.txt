@@ -1,0 +1,177 @@
+# Diário de Estudos — Dia 16
+
+**Data:** 10/11/2026  
+**Horário:** 10:40 às 12:10  
+**Duração:** 1h30  
+**Matéria:** SQL Server  
+**Banco de dados:** Clientes, Pedidos, Produtos e ItensPedidos
+
+## 1. Conteúdos estudados
+
+- Funções de agregação: `SUM()` e `COUNT()`.
+- Diferenças entre `COUNT()`, `COUNT(DISTINCT)` e `SUM()`.
+- Agrupamentos com `GROUP BY`.
+- Filtros de agrupamentos com `HAVING`.
+- Diferenças entre `WHERE` e `HAVING`.
+- Operadores lógicos `AND` e `OR`.
+- Filtro de múltiplos valores com `IN`.
+- Ordenação com `ORDER BY`.
+- Construção de relatórios comerciais utilizando múltiplos JOINs.
+- Interpretação de requisitos antes da construção de consultas.
+
+## 2. Exercícios realizados
+
+### Exercício 1 — Relatório de vendas por produto
+**Objetivo:** apresentar o nome e a categoria dos produtos, quantidade total vendida e faturamento total.
+Requisitos:
+- Considerar somente pedidos concluídos.
+- Mostrar produtos com mais de 2 unidades vendidas.
+- Mostrar produtos com faturamento superior a R$ 500.
+- Ordenar pelo faturamento em ordem decrescente.
+
+**Consulta:**
+```sql
+SELECT
+    pr.nome,
+    pr.categoria,
+    SUM(it.quantidade) AS total_vendido,
+    SUM(it.quantidade * it.preco_unitario - it.desconto) AS faturamento_total
+FROM Produtos pr
+INNER JOIN ItensPedidos it ON pr.id = it.produto_id
+INNER JOIN Pedidos pd ON pd.id = it.pedido_id
+WHERE pd.status = 'Concluído'
+GROUP BY pr.categoria, pr.nome
+HAVING
+    SUM(it.quantidade) > 2
+    AND SUM(it.quantidade * it.preco_unitario - it.desconto) > 500
+ORDER BY faturamento_total DESC;
+```
+
+**Resultado obtido:**
+| Produto | Unidades | Faturamento |
+|---|---:|---:|
+| Monitor 24 Polegadas | 3 | R$ 2.520,00 |
+| Teclado Mecânico | 3 | R$ 690,00 |
+| Webcam Full HD | 3 | R$ 520,00 |
+
+### Exercício 2 — Quantidade de unidades, pedidos e clientes por produto
+**Objetivo:** descobrir, para cada produto, quantas unidades foram vendidas, quantos pedidos diferentes tiveram sua venda e quantos clientes diferentes compraram o produto.
+
+**Consulta:**
+```sql
+SELECT
+    pr.nome,
+    SUM(it.quantidade) AS total_unidades,
+    COUNT(DISTINCT it.pedido_id) AS total_pedidos,
+    COUNT(DISTINCT pd.cliente_id) AS total_clientes
+FROM Produtos pr
+INNER JOIN ItensPedidos it ON pr.id = it.produto_id
+INNER JOIN Pedidos pd ON pd.id = it.pedido_id
+INNER JOIN Clientes c ON c.id = pd.cliente_id
+GROUP BY pr.nome;
+```
+
+### Exercício 3 — Relatório de faturamento por categoria
+**Objetivo:** apresentar o total de unidades vendidas, faturamento e quantidade de pedidos por categoria.
+Requisitos:
+- Somente pedidos concluídos.
+- Mais de 3 unidades vendidas.
+- Faturamento superior a R$ 1.000.
+- Ordenar pelo faturamento decrescente.
+
+**Consulta:**
+```sql
+SELECT
+    pr.categoria,
+    SUM(it.quantidade) AS total_unidades,
+    SUM(it.quantidade * it.preco_unitario - it.desconto) AS faturamento_total,
+    COUNT(DISTINCT it.pedido_id) AS total_pedidos
+FROM Produtos pr
+INNER JOIN ItensPedidos it ON pr.id = it.produto_id
+INNER JOIN Pedidos pd ON pd.id = it.pedido_id
+INNER JOIN Clientes c ON c.id = pd.cliente_id
+WHERE pd.status = 'Concluído'
+GROUP BY pr.categoria
+HAVING
+    SUM(it.quantidade) > 3
+    AND SUM(it.quantidade * it.preco_unitario - it.desconto) > 1000
+ORDER BY faturamento_total DESC;
+```
+
+**Resultado obtido:**
+Somente a categoria Periféricos apareceu, com:
+- 10 unidades vendidas.
+- R$ 1.650,00 de faturamento.
+- 4 pedidos diferentes.
+
+**Aprendizado:**
+Foi compreendido que o `GROUP BY` determina o nível de detalhamento do relatório.
+Exemplos:
+- `GROUP BY pr.nome`: agrupamento por produto.
+- `GROUP BY pr.categoria`: agrupamento por categoria.
+- `GROUP BY pr.categoria, pr.nome`: agrupamento por categoria e produto.
+
+Também foi reforçada a regra de que colunas presentes no `SELECT`, quando não estão dentro de funções de agregação, precisam estar no `GROUP BY`.
+
+### Exercício 4 — Relatório de desempenho por produto
+**Objetivo:** identificar produtos com bom desempenho comercial.
+Requisitos:
+- Nome do produto e categoria.
+- Total de unidades vendidas.
+- Faturamento total.
+- Quantidade de pedidos diferentes.
+- Somente pedidos concluídos.
+- Somente categorias Periféricos, Monitores ou Computadores.
+- Produtos com mais de 1 unidade vendida OU faturamento superior a R$ 1.000.
+- Ordenação por faturamento decrescente.
+
+**Consulta:**
+```sql
+SELECT
+    pr.nome,
+    pr.categoria,
+    SUM(it.quantidade) AS total_unidades,
+    SUM(it.quantidade * it.preco_unitario - it.desconto) AS faturamento_total,
+    COUNT(DISTINCT it.pedido_id) AS total_pedidos
+FROM Produtos pr
+INNER JOIN ItensPedidos it ON pr.id = it.produto_id
+INNER JOIN Pedidos pd ON pd.id = it.pedido_id
+WHERE
+    pd.status = 'Concluído'
+    AND pr.categoria IN ('Periféricos', 'Monitores', 'Computadores')
+GROUP BY pr.categoria, pr.nome
+HAVING
+    SUM(it.quantidade) > 1
+    OR SUM(it.quantidade * it.preco_unitario - it.desconto) > 1000
+ORDER BY faturamento_total DESC;
+```
+
+## 3. Dificuldades e observações gerais
+
+Durante a sessão, as principais dificuldades foram:
+
+- Diferenciar quantidade de registros e quantidade de unidades.
+- Identificar corretamente o nível de agrupamento necessário.
+- Interpretar o que cada requisito solicita antes de escolher a função de agregação.
+- Reconhecer erros de sintaxe e relacionamentos incorretos.
+- Entender por que o SQL exige determinadas colunas no `GROUP BY`.
+
+Um ponto importante foi perceber que resultados aparentemente diferentes podem estar corretos dependendo do filtro aplicado.
+
+Exemplo: uma categoria pode apresentar faturamento elevado, mas não aparecer no relatório quando também existe uma exigência mínima de unidades vendidas.
+
+## 4. Evolução durante a sessão
+
+No início da sessão, houve dificuldade em distinguir `COUNT()` e `SUM()` e em escolher corretamente as colunas de agrupamento.
+
+Ao longo dos exercícios, foi possível:
+
+- Construir consultas com múltiplas agregações.
+- Diferenciar pedidos, clientes, registros e unidades.
+- Entender o funcionamento do `GROUP BY`.
+- Aplicar corretamente `WHERE` e `HAVING`.
+- Utilizar `AND` e `OR` conforme os requisitos.
+- Construir relatórios comerciais envolvendo quatro tabelas relacionadas.
+
+**Avaliação:** evolução positiva. O raciocínio sobre agregações e agrupamentos apresentou melhora significativa. Ainda é necessário reforçar a interpretação dos enunciados e a identificação das tabelas e colunas antes de escrever as consultas.
+
