@@ -35,10 +35,14 @@ Em cada pasta de diário (`Dia 1`, `Dia 2`, etc.), você verá:
 | [Dia 8](./Semana%202/Dia-8.txt) | `CTE (Common Table Expression)` — `WITH` | ✅ Concluído |
 | [Dia 9](./Semana%202/Dia-9.txt) | `EXISTS`, `NOT EXISTS`, `UNION` e Subqueries Correlacionadas | ✅ Concluído |
 | [Dia 10](./Semana%202/Dia-10.txt) | Revisão: `EXISTS`, `NOT EXISTS`, `AVG()`, Subqueries Aninhadas, `IN`, `LIKE` e `UNION` | ✅ Concluído |
-| [Dia 11](./Semana%202/Dia-11.txt) | Revisão de Agregações, Funções de Janela `(OVER, PARTITION BY, ROW_NUMBER, LAG, LEAD)`, `CTEs`, `CAST()` e `ROUND()` | ✅ Concluído |
+| [Dia 11](./Semana%202/Dia-11.txt) | Revisão de Agregações, Funções de Janela (`OVER`, `PARTITION BY`, `ROW_NUMBER`, `LAG`, `LEAD`), `CTEs`, `CAST()` e `ROUND()` | ✅ Concluído |
 | [Dia 12](./Semana%202/Dia-12.txt) | `RANK()`, `DENSE_RANK()` e Comparação de Rankings | ✅ Concluído |
-| [Dia 13](./Semana%202/Dia-13.txt) |  Revisão prática e integração de funções de janela. | ✅ Concluído |
-| [Dia 14](./Semana%202/Dia-14.txt) |  | ⏳ Pendente |
+| [Dia 13](./Semana%202/Dia-13.txt) | Revisão prática e integração de funções de janela | ✅ Concluído |
+| [Dia 14](./Semana%202/Dia-14.txt) | Modelagem relacional, relacionamentos entre tabelas, `PRIMARY KEY`, `FOREIGN KEY` e `WHERE` vs. `HAVING` | ✅ Concluído |
+| [Dia 15](./Semana%203/Dia-15.txt) | Consultas com múltiplos `JOINs`, agregações e análise de vendas | ✅ Concluído |
+| [Dia 16](./Semana%203/Dia-16.txt) | Relatórios comerciais com `SUM()`, `COUNT()`, `COUNT(DISTINCT)`, `GROUP BY` e `HAVING` | ✅ Concluído |
+| [Dia 17](./Semana%203/Dia-17.txt) | Agregações condicionais (`SUM(CASE WHEN...)`), `COUNT(DISTINCT CASE...)`, `NULLIF()`, `CAST()` e Ticket Médio | ✅ Concluído |
+| [Dia 18](./Semana%203/Dia-18.txt) | Próximo estudo | ⏳ Pendente |
 
 
 > *"Constconstância vence a intensidade."* 🚀 Acompanhe a jornada!
